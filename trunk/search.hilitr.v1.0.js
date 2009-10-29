@@ -14,12 +14,12 @@ javascript: (function () {
       showTopMenu: true,
       useArrowKeys: true,
       //english stop words with length>2
-      stopwords: /\\b(about|are|com|for|from|how|that|the|this|was|what|when|where|who|will|with|und|the|www)\\b/,
+      stopwords: /\b(about|and|are|com|you|for|from|how|that|the|this|was|what|when|where|who|will|with|und|the|www)\b/gi,
     },
     pos: [],
     currIndex: 0,
     count: 0,
-    ccount: 0,    
+    wcount: 0,    
     freq: {
       f: {},
       p: {},
@@ -39,19 +39,19 @@ javascript: (function () {
                 background-color:#333;\
                 width:100%;\
                 top:0;margin:0;\
-                padding:0;\
+                padding:0 0 5px;\
                 display:none;\
+                line-height:1;\
             }\
             body.showHilitrMenu .searchHilitrContainer{\
                 display:block;\
             }\
             .searchHilitrContainer li{\
                 color:#666;\
-                font-size:27px;\
                 float:left;\
                 padding:6px 3px;\
-                margin:2px 2px 10px;\
-                background-color:#eee !important;\
+                margin:2px;\
+                background:#eee !important;\
                 xline-height:1.4em;\
                 overflow:hidden;\
                 text-transform:capitalize;\
@@ -64,6 +64,9 @@ javascript: (function () {
                 display:block;\
                 text-align:left;\
                 text-transform:none;\
+                white-space:nowrap;\
+                float:none;width:auto;\
+                margin:0;padding:0;height:17px;\
              }\
             .searchHilitrContainer li span a{\
                 padding:1px 3px;\
@@ -75,13 +78,14 @@ javascript: (function () {
                 color:blue;\
              }\
             .searchHilitrContainer li small{\
-                padding:6px;\
+                padding:3px 6px;\
                 display:block;\
                 margin-bottom:5px;\
-                background-color:#ffff99;\
+                background-color:#ffff99;font-size:24px;\
              }\
             .searchHilitrContainer li small em{\
-                margin-left:8px\
+                margin-left:8px;background:transparent;\
+                font-weight:normal;padding:0;\
              }\
             #searchHilitrInfo{\
                 display:none;\
@@ -102,7 +106,7 @@ javascript: (function () {
             body.searchHilite-ON .searchHilitrWord{\
                 background-color:#ff0 !important;\
                 padding:2px 5px 2px 5px !important;\
-                -moz-border-radius:2px;\
+                -moz-border-radius:2px;color:#000;\
                 border:1px solid #aaa !important;\
              }\
             body.searchHilitrContextualize .searchHilitrSntce.current{\
@@ -127,7 +131,7 @@ javascript: (function () {
             .scrollbarMark{\
                 position:fixed;\
                 right:3px;\
-                border-bottom:1px solid red;\
+                border-bottom:1px solid orange;\
                 padding:3px 6px;\
                 background-color:gold;\
                 cursor:pointer;\
@@ -136,7 +140,7 @@ javascript: (function () {
                 float:right;\
                 font-size:12px;\
                 margin:3px 5px;\
-                padding:3px;\
+                padding:1px 3px 6px;\
              }\
             .searchHilitrContainer .searchHilitrContextLink input{\
                 vertical-align:sub;\
@@ -147,15 +151,12 @@ javascript: (function () {
       jQ('<style id="searchHilitrCSS" type="text/css"></style>').text(css).appendTo("head");
       jQ('<ul class="searchHilitrContainer"></ul><div id="searchHilitrInfo"></div>').prependTo("body");
       jQ('<li>')
-        .append('<label><input type="checkbox" name="searchHilite-ON" checked>Highligh ON/OFF</label>')
-        .append('<label><input type="checkbox" name="searchHilitrColorify">Colorify</label>')
+        .append('<label><input type="checkbox" name="searchHilite-ON" checked>Highlight ON/OFF</label>')
         .append('<label><input type="checkbox" name="enableshortcuts" checked>Use arrow keys</label>')
+        .append('<label><input type="checkbox" name="searchHilitrColorify">Colors, please!</label>')
         .append('<label ><input type="checkbox" name="searchHilitrContextualize" disabled>Show in context</label>')
       .addClass('searchHilitrContextLink')
       .appendTo(".searchHilitrContainer");
-      jQ(".searchHilitrContainer li.searchHilitrContextLink label").eq(3).hide().end().find('input').live('change', function () {
-        jQ('body').toggleClass(jQ(this).attr('name'));
-      });
       jQ('body').addClass('XsearchHilitrColorify searchHilite-ON enableshortcuts');
       if (this.config.showTopMenu) {
         jQ('body').addClass('showHilitrMenu');
@@ -165,8 +166,8 @@ javascript: (function () {
     },
     init: function () {
       self = this;
-      if (typeof jQuery == 'undefined') {
-        this.require('http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js', function () {
+      if (typeof jQuery == 'undefined'||jQuery.prototype.jquery<"1.2.6") {
+        this.require('http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.min.js', function () {
           jQ = jQuery.noConflict();
           self.go()
         })
@@ -217,7 +218,7 @@ javascript: (function () {
       this.slideTo(--this.currIndex);
     },
     extract: function (url) {
-      var where = url.toString();
+      var where = url.toString(),s=null;
       if (where.indexOf('?') == -1) return;
       var q = where.substr(where.indexOf('?') + 1);
       q.replace(/([^=&]+)=([^&]*)/g, function (m, k, v) {
@@ -259,7 +260,7 @@ javascript: (function () {
         this.freq['f'][n] = 1;
         this.freq['p'][n] = {};
         this.freq['p'][n][1] = this.count;
-        this.freq['c'][n] = ++this.ccount;
+        this.freq['c'][n] = ++this.wcount;
       }
       return ['<span class="', klass, ' hilite', this.count, ' word', this.freq['c'][n], '">', needle, '</span>'].join("");
     },
@@ -276,9 +277,11 @@ javascript: (function () {
         }).show();
         return;
       }
-      var needles=phrase.replace(/([-.*+?^${}()|[\]\/\\])/g, "\\$1")
-                      .replace(/^\s+|\s+$/g, "")
-                      .replace(/\s+/g, "|");
+      var needles=
+          phrase.replace(/("|'|^\s+|\s+$)/g,"")
+                .replace(this.config.stopwords,"")
+                .replace(/([-.*+?^${}()|[\]\/\\])/g, "\\$1")
+                .replace(/\s+/g, "|");
       
       //filter-out anything shorter than 4 chars
       needles = jQ.makeArray(jQ(needles.split('|')).filter(function () {
@@ -326,6 +329,11 @@ javascript: (function () {
         .appendTo("body");
       }
       this.attachShortcuts();
+      jQ(".searchHilitrContainer li.searchHilitrContextLink label")
+          .eq(3).hide().end()
+          .find('input').bind('change', function(){
+            jQ('body').toggleClass(jQ(this).attr('name'));
+          });
     }
   }
 })();
