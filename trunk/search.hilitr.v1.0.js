@@ -1,10 +1,11 @@
 
 /***********************************************
  searchHilitr v. 1.0 --- Highlight search keywords
+ -- Optimised for bookmarklet use..
  http://www.smallmeans.com/tools/searchHilitr
 
- Copyright (c) 2009 smallmeans.com 
- Revision date: 27 Oct 2009
+ Copyright (c) 2009 smallmeans.com
+ Revision date: 29 Oct 2009
 ***********************************************/
 
 javascript: (function () {
@@ -19,22 +20,240 @@ javascript: (function () {
     pos: [],
     currIndex: 0,
     count: 0,
-    wcount: 0,    
+    wcount: 0,
     freq: {
       f: {},
       p: {},
-      c: {}
+      c: {},
+      w: {}
     },
-    go: function (phrase) {
-      if(jQ('body').hasClass('searchHilitrEnabled')){return this.search(phrase,true);}
+    init: function () {
+      self = this;
+      if (typeof jQuery == 'undefined'||jQuery.prototype.jquery<"1.2.6") {
+        this.require(
+          'http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js',
+          function () {
+           jQ = jQuery.noConflict();
+           self.go();
+        });
+      } else {
+        jQ = jQuery;
+        this.go();
+      }
+    },
+    wrap: function (klass, needle) {
+      n = needle.toLowerCase();
+      this.count++;
+      //this.freq['f'][n]=this.freq['f'][n]?++this.freq['f'][n]:1;
+      if (this.freq['f'][n]) {
+        this.freq['f'][n]++;
+        this.freq['p'][n][this.freq['f'][n]] = this.count;
+      } else {
+        this.freq['f'][n] = 1;
+        this.freq['p'][n] = {};
+        this.freq['p'][n][1] = this.count;
+        this.freq['c'][n] = ++this.wcount;
+      }
+      this.freq['w'][this.count]=this.freq['c'][n];
+      return ['<span class="',
+               klass, ' hilite', this.count, ' word', this.freq['c'][n], '"',
+               'title="', needle,' #', this.count, '"', '>',needle, '</span>'].join("");
+    },
+    highlight: function (context, regex, klass) {
+      return jQ(context).html(jQ(context).html().replace(regex, function (a, b, c) {
+        return (a.charAt(0) == '<') ? a : self.wrap(klass, c);
+      }));
+    },
+    dismiss: function(){
+      //tear down Rome and head east..
+      jQ('body').removeClass('searchHilitrEnabled enableHilite enableshortcuts showHilitrMenu');
+      jQ('.searchHilitrContainer,#searchHilitrInfo,#searchHilitrCSS').remove();
+      document.onkeydown=this.oldOnkey;
+    },
+    extract: function (url) {
+      var where = url.toString(),s=null;
+      if (where.indexOf('?') == -1) return;
+      var q = where.substr(where.indexOf('?') + 1);
+      q.replace(/([^=&]+)=([^&]*)/g, function (m, k, v) {
+        if (/^(q|p|query|keywords?|search|search_?terms?|sog|soeg|find|s)$/i.test(k)) {
+          if (/^cache/.test(v)) {
+            v = v.substr(v.indexOf('+') + 1)
+          }
+          s = unescape(v.replace(/\+/g, ' '));
+        }
+      });
+      return s;
+    },
+    nextInstance: function () {
+      if (this.currIndex == this.count) {
+        return;
+      }
+      this.slideTo(++this.currIndex);
+    },
+    prevInstance: function () {
+      if (this.currIndex == 1) {
+        return;
+      }
+      this.slideTo(--this.currIndex);
+    },
+    gotoLink: function (el) {
+      this.slideTo(jQ(el).data('c'), true);
+    },
+    slideTo: function (i, isClick) {
+      var offset = this.pos[i],
+      b = jQ('body');
+      jQ('html,body').stop().animate({scrollTop: offset-90},800);
+      jQ('.searchHilitrWord,.searchHilitrSntce').removeClass('current');
+      if(jQ(b).hasClass('searchHilitrContextualize')){
+        jQ('.searchHilitrWord.hilite' + i).parent('.searchHilitrSntce').addClass('current');
+      }else{
+        jQ('.searchHilitrWord.hilite' + i).addClass('current');
+      }
+      if(isClick){this.currIndex = i;}
+    },
+    search: function (what,rerun) {
+      phrase = what || this.extract(document.referrer) || this.extract(document.location);
+      if (!phrase) {
+        if(!rerun){
+          var a=jQ('<a>nothing happened</a>').click(function(){self.dismiss();});
+          var go=jQ("<input type='button' value='Go!'>")
+                  .bind('click',function(){
+                     self.search(jQ(this).prev().val(),true);
+                     jQ('#searchHilitrInfo').hide();
+                     jQ('.searchHilitrContainer').show();
+                 });
+          jQ('#searchHilitrInfo')
+            .append("Oops... Couldn't find the word you were looking for..")
+            .append("<br/>Pretend ").append(a)
+            .append(" or enter your search below:<br/><input class='txt' type='text' size='23'>")
+            .append(go);
+        }
+        jQ('#searchHilitrInfo').show();
+        jQ('.searchHilitrContainer').hide();
+        jQ('#searchHilitrInfo input:eq(0)').focus();
+        return;
+      }else{
+        jQ('.searchHilitrContainer li:not(.searchHilitrContextLink)').remove();
+        jQ('#searchHilitrInfo').hide();
+        jQ('.searchHilitrContainer').show();
+      }
+      var needles=
+          phrase.replace(/("|'|^\s+|\s+$)/g,"")
+                .replace(this.config.stopwords,"")
+                .replace(/([-.*+?^${}()|[\]\/\\])/g, "\\$1")
+                .replace(/\s+/g, "|");
+
+      //filter-out anything shorter than 3 chars
+      if(phrase.length<2) return;
+      needles = jQ.makeArray(jQ(needles.split('|')).filter(function () {
+                   return this.length > 2
+                })).join("|");
+
+      regex = new RegExp('(<[^>]*>)|\\b(' + needles + ')', this.config.isCasesensitive ? 'g' : 'ig');
+      tregex = "([^,.?<>]*)\\b(site statistics|statistics|site)";
+      tregex = ["([^,.?><]+)\\b(", phrase, ")"].join("");
+
+      this.highlight(jQ('body'), regex, 'searchHilitrWord');
+
+      o = [];
+      jQ.each(searchHilitr.freq.f, function (k, v) {
+        var i=0, sp="", d = [];
+        sp = jQ('<span>');
+        while (i < v) {
+          if (i > 9) break;
+          jQ('<a>').text(++i).data('c', self.freq['p'][k][i]).bind('click', function () {
+            self.gotoLink(this);
+          }).appendTo(jQ(sp));
+        }
+        jQ('<li>')
+          .append(jQ('<small>' + k + '<em>(' + v + ')</em></small>')
+          .addClass('word' + self.freq['c'][k]))
+          .append(sp)
+        .appendTo('.searchHilitrContainer')
+      });
+
+      //scrollbar nav markers
+      var i = 0,o=null,bh = jQ(document).height();
+      while (i < this.count) {
+        var s=0;
+        try{
+          o = jQ('.searchHilitrWord').eq(i++).position().top;
+        }catch(aarrrgh){}
+
+        this.pos[i] = o||1;
+        ratio = o/bh;
+        top = ratio * screen.height-70;
+        if (top < 80) top = 80+i*2;
+        jQ('<a class="scrollbarMark word'+ this.freq['w'][i]+'" title="Go to #' + i + '"></a>')
+          .data('c', i).css('top', top)
+          .bind('click', function () {
+            self.gotoLink(this);
+          })
+        .appendTo("body");
+      }
+      this.attachShortcuts();
+      jQ(".searchHilitrContainer li.searchHilitrContextLink label")
+          .eq(3).hide().end()
+          .find('input').bind('change', function(){
+            self.changeIsGonnaCome(jQ(this).attr('name'),jQ(this).attr('checked'));
+          });
+    },
+    changeIsGonnaCome:function(change, hasCome){
+      this.config[change]=hasCome;
+      if(change=="enableHilite"){
+        var c=".searchHilitrContainer";
+        if(hasCome){
+          jQ(c).css('height','auto');
+        }
+        else{
+          jQ(c).animate(
+               {height: "22px"}, 1000,
+                function(){
+                 jQ('body').toggleClass(change);
+               });return;
+        }
+      }
+      jQ('body').toggleClass(change);
+    },
+    require: function (src, callback) {
+      var c = document.createElement("script");
+      c.src = src;
+      c.type = "text/javascript";
+      if (callback) {
+        c.onload = callback;
+      }
+      document.getElementsByTagName("head")[0].appendChild(c);
+    },
+    attachShortcuts: function () {
+      this.oldOnkey = document.onkeydown;
+      document.onkeydown = function (e) {
+        var a = e || window.event;
+        if(typeof self.oldOnkey == 'function') {
+          self.oldOnkey(e);
+        }
+        if(!self.config.enableshortcuts){
+          return;
+        }
+        if(a.keyCode == 37) {//left arrow
+          self.prevInstance();
+        }
+        else if(a.keyCode == 39) {//right arrow
+          self.nextInstance();
+        }
+      }
+    },
+    go: function (phrase){
+      if(jQ('body').hasClass('searchHilitrEnabled')){
+        return this.search(phrase,true);
+      }
       var css = "\
             body{margin-top:78px;position:relative;}\
-            body.searchHilitrColorify.searchHilite-ON .word1{background-color: #FFFF66 !important}\
-            body.searchHilitrColorify.searchHilite-ON .word3{background-color: #88cc00 !important}\
-            body.searchHilitrColorify.searchHilite-ON .word2{background-color: #FF99FF !important}\
-            body.searchHilitrColorify.searchHilite-ON .word4{background-color: #A0FFFF !important}\
-            body.searchHilitrColorify.searchHilite-ON .word5{background-color: #ff6666 !important}\
-            body.searchHilitrColorify.searchHilite-ON .word6{background-color: #3333ff !important}\
+            body.searchHilitrColorify.enableHilite .word1{background-color: #FFFF66 !important}\
+            body.searchHilitrColorify.enableHilite .word3{background-color: #88cc00 !important}\
+            body.searchHilitrColorify.enableHilite .word2{background-color: #FF99FF !important}\
+            body.searchHilitrColorify.enableHilite .word4{background-color: #A0FFFF !important}\
+            body.searchHilitrColorify.enableHilite .word5{background-color: #ff6666 !important}\
+            body.searchHilitrColorify.enableHilite .word6{background-color: #3333ff !important}\
             .searchHilitrContainer{\
                 position:fixed;\
                 background-color:#333;\
@@ -48,7 +267,7 @@ javascript: (function () {
             body.showHilitrMenu .searchHilitrContainer{\
                 display:block;\
             }\
-            body.searchHilite-ON .searchHilitrContainer{\
+            body.enableHilite .searchHilitrContainer{\
             }\
             .searchHilitrContainer li{\
                 float:left;\
@@ -59,7 +278,7 @@ javascript: (function () {
                 overflow:hidden;display:none;\
                 text-transform:capitalize;\
              }\
-           body.searchHilite-ON .searchHilitrContainer li{\
+           body.enableHilite .searchHilitrContainer li{\
                 color:#99f;display:block;\
              }\
            body.searchHilitrColorify .searchHilitrContainer li{\
@@ -128,8 +347,8 @@ javascript: (function () {
               #searchHilitrInfo,.searchHilitrContainer,.scrollbarMark{\
                 z-index:999999;\
               }\
-            body.searchHilitrContextualize.searchHilite-ON .searchHilitrSntce,\
-            body.searchHilite-ON .searchHilitrWord{\
+            body.searchHilitrContextualize.enableHilite .searchHilitrSntce,\
+            body.enableHilite .searchHilitrWord{\
                 background:#ff0 !important;\
                 padding:2px 5px 2px 5px !important;\
                 -moz-border-radius:2px;color:#000;\
@@ -149,7 +368,7 @@ javascript: (function () {
                 background-color:red;\
                 padding:2px;\
              }\
-            body.searchHilite-ON .searchHilitrWord.current{\
+            body.enableHilite .searchHilitrWord.current{\
                 border-color:#555 !important;\
                 font-weight:bold;\
                 font-size:125%;\
@@ -182,7 +401,7 @@ javascript: (function () {
       jQ('<ul class="searchHilitrContainer"></ul><div id="searchHilitrInfo"></div>').prependTo("body");
       jQ('<li>')
         .append(
-          '<label><input type="checkbox" name="searchHilite-ON" checked>Highlight ON|OFF</label>'+
+          '<label><input type="checkbox" name="enableHilite" checked>Highlight ON|OFF</label>'+
           '<label title="Use the LEFT,RIGHT arrow keys to move back and forth">'+
           '<input type="checkbox" name="enableshortcuts" checked>Use arrow keys</label>'+
           '<label><input type="checkbox" name="searchHilitrColorify">Colors, please!</label>'+
@@ -190,223 +409,13 @@ javascript: (function () {
         )
       .addClass('searchHilitrContextLink')
       .appendTo(".searchHilitrContainer");
-      jQ('body').addClass('searchHilitrEnabled searchHilite-ON enableshortcuts');
+      jQuery('script').remove();
+      jQ('body').addClass('searchHilitrEnabled enableHilite enableshortcuts');
       if (this.config.showTopMenu) {
         jQ('body').addClass('showHilitrMenu');
       }
-      jQuery('script').remove();
       this.search(phrase);
-    },
-    init: function () {
-      self = this;
-      if (typeof jQuery == 'undefined'||jQuery.prototype.jquery<"1.2.6") {
-        this.require('http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.min.js', function () {
-          jQ = jQuery.noConflict();
-          self.go()
-        })
-      } else {
-        jQ = jQuery;
-        this.go()
-      }
-    },
-    require: function (src, callback) {
-      var c = document.createElement("script");
-      c.src = src;
-      c.type = "text/javascript";
-      if (callback) {
-        c.onload = callback
-      }
-      document.getElementsByTagName("head")[0].appendChild(c)
-    },
-    attachShortcuts: function () {
-      this.oldOnkey = document.onkeydown;
-      document.onkeydown = function (e) {
-        var a = e || window.event;
-        if(typeof self.oldOnkey == 'function') {
-          self.oldOnkey(e);
-        }
-        if(!self.config.enableshortcuts){
-          return;
-        }
-        if(a.keyCode == 37) {//left arrow
-          self.prevInstance();
-        }
-        else if(a.keyCode == 39) {//right arrow
-          self.nextInstance();
-        }
-      }
-    },
-    nextInstance: function () {
-      if (this.currIndex == this.count) {
-        return;
-      }
-      this.slideTo(++this.currIndex);
-    },
-    prevInstance: function () {
-      if (this.currIndex == 1) {
-        return;
-      }
-      this.slideTo(--this.currIndex);
-    },
-    extract: function (url) {
-      var where = url.toString(),s=null;
-      if (where.indexOf('?') == -1) return;
-      var q = where.substr(where.indexOf('?') + 1);
-      q.replace(/([^=&]+)=([^&]*)/g, function (m, k, v) {
-        if (/^(q|p|query|keywords?|search|search_?terms?|sog|soeg|find|s)$/i.test(k)) {
-          if (/^cache/.test(v)) {
-            v = v.substr(v.indexOf('+') + 1)
-          }
-          s = unescape(v.replace(/\+/g, ' '));
-        }
-      });
-      return s;
-    },
-    gotoLink: function (el) {
-      this.slideTo(jQ(el).data('c'), true);
-    },
-    slideTo: function (i, byClick) {
-      var offset = this.pos[i],
-      b = jQ('body');
-      jQ('html,body').stop().animate({scrollTop: offset-90},800);
-      jQ('.searchHilitrWord,.searchHilitrSntce').removeClass('current');
-      if(jQ(b).hasClass('searchHilitrContextualize')){
-        jQ('.searchHilitrWord.hilite' + i).parent('.searchHilitrSntce').addClass('current');
-      }else{
-        jQ('.searchHilitrWord.hilite' + i).addClass('current');
-      }
-      if(byClick){this.currIndex = i;}
-    },
-    wrap: function (klass, needle) {
-      n = needle.toLowerCase();
-      this.count++;
-      //this.freq['f'][n]=this.freq['f'][n]?++this.freq['f'][n]:1;
-      if (this.freq['f'][n]) {
-        this.freq['f'][n]++;
-        this.freq['p'][n][this.freq['f'][n]] = this.count;
-      } else {
-        this.freq['f'][n] = 1;
-        this.freq['p'][n] = {};
-        this.freq['p'][n][1] = this.count;
-        this.freq['c'][n] = ++this.wcount;
-      }
-      return ['<span class="', 
-              klass, ' hilite', this.count, ' word', this.freq['c'][n], '"',
-              'title="', needle,' #', this.count, '"', '>',needle, '</span>'].join("");
-    },
-    highlight: function (context, regex, klass) {
-      return jQ(context).html(jQ(context).html().replace(regex, function (a, b, c) {
-        return (a.charAt(0) == '<') ? a : self.wrap(klass, c);
-      }));
-    },
-    dismiss: function() {
-      jQ('body').removeClass('searchHilitrEnabled searchHilite-ON enableshortcuts showHilitrMenu');
-      jQ('.searchHilitrContainer,#searchHilitrInfo,#searchHilitrCSS').remove();
-      document.onkeydown=this.oldOnkey;
-    },
-    search: function (what,rerun) {
-      phrase = what || this.extract(document.referrer) || this.extract(document.location);
-console.log(phrase,rerun)
-      if (!phrase) {
-        if(!rerun){  
-          var a=jQ('<a>nothing happened</a>').click(function(){self.dismiss();});
-          var go =jQ("<input type='button' value='Go!'>")
-                  .bind('click',function(){
-                        self.search(jQ(this).prev().val(),true);
-                        jQ('#searchHilitrInfo').hide();
-                        jQ('.searchHilitrContainer').show();
-                  });
-          jQ('#searchHilitrInfo')
-            .append("Oops... Couldn't find the word you were looking for..")
-            .append("<br/>Pretend ").append(a)
-            .append(" or enter your search below:<br/><input class='txt' type='text' size='23'>")
-            .append(go);
-        }
-        jQ('#searchHilitrInfo').show();
-        jQ('.searchHilitrContainer').hide();
-        jQ('#searchHilitrInfo input:eq(0)').focus();
-        return;
-      }else{
-        jQ('.searchHilitrContainer li:not(.searchHilitrContextLink)').remove();
-        jQ('#searchHilitrInfo').hide();
-        jQ('.searchHilitrContainer').show();
-      }
-      var needles=
-          phrase.replace(/("|'|^\s+|\s+$)/g,"")
-                .replace(this.config.stopwords,"")
-                .replace(/([-.*+?^${}()|[\]\/\\])/g, "\\$1")
-                .replace(/\s+/g, "|");
-
-      //filter-out anything shorter than 3 chars
-      if(phrase.length<2) return;
-      needles = jQ.makeArray(jQ(needles.split('|'))
-                  .filter(function () {
-                    return this.length > 2
-                  })).join("|");
-      regex = ["([^,.?><]+)\\b(", phrase, ")"].join("");
-      regex = new RegExp('(<[^>]*>)|\\b(' + needles + ')', this.config.isCasesensitive ? 'g' : 'ig');
-      xregex = "([^,.?<>]*)\\b((search phrase)|(search|phrase))";
-      console.log(regex);
-      xregex = "([^,.]+)(site statistics|statistics|site)";
-      this.highlight(jQ('body'), regex, 'searchHilitrWord');
-      o = [];
-      jQ.each(searchHilitr.freq.f, function (k, v) {
-        var i = 0,
-        d = [];
-        sp = jQ('<span>');
-        while (i < v) {
-          if (i > 9) break;
-          jQ('<a>').text(++i).data('c', self.freq['p'][k][i]).bind('click', function () {
-            self.gotoLink(this);
-          }).appendTo(jQ(sp));
-        }
-        jQ('<li>')
-          .append(jQ('<small>' + k + '<em>(' + v + ')</em></small>')
-          .addClass('word' + self.freq['c'][k]))
-          .append(sp)
-        .appendTo('.searchHilitrContainer')
-      });
-      
-      //scrollbar nav markers
-      var i = 0,o=null,bh = jQ(document).height();
-      while (i < this.count) {
-        var s=0;
-        try{
-          o = jQ('.searchHilitrWord').eq(i++).offset().top;
-        }catch(r){o=-1}
-
-        this.pos[i] = o||0;
-        ratio = o/bh;
-        top = ratio * screen.availHeight-50;
-        if (top < 80) top = 80+i*2;
-        jQ('<a class="scrollbarMark" title="Go to #' + i + '"></a>')
-          .data('c', i).css('top', top)
-          .bind('click', function () {
-            self.gotoLink(this);
-          })
-        .appendTo("body");
-      }
-      this.attachShortcuts();
-      jQ(".searchHilitrContainer li.searchHilitrContextLink label")
-          .eq(3).hide().end()
-          .find('input').bind('change', function(){
-            self.changeIsGonnaCome(jQ(this).attr('name'),jQ(this).attr('checked'));
-          });
-    },
-    changeIsGonnaCome:function(change,hasCome){
-      this.config[change]=hasCome;
-      if(change=="searchHilite-ON"){
-        var c=".searchHilitrContainer";
-        if(hasCome){
-          jQ(c).css('height','auto');
-        }
-        else{ 
-          jQ(c).animate({height: "22px"}, 1000,function(){jQ('body').toggleClass(change);});return;
-        }
-      }
-      jQ('body').toggleClass(change);
     }
   }
 })();
 searchHilitr.init();
-
