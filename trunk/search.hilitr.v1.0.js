@@ -96,10 +96,8 @@ javascript: (function () {
       }
       this.slideTo(--this.currIndex);
     },
-    gotoLink: function (el) {
-      this.slideTo(jQ(el).data('c'), true);
-    },
     slideTo: function (i, isClick) {
+console.log('going to:'+i);
       var offset = this.pos[i],
       b = jQ('body');
       jQ('html,body').stop().animate({scrollTop: offset-90},800);
@@ -138,9 +136,9 @@ javascript: (function () {
         jQ('.searchHilitrContainer').show();
       }
       var needles=
-          phrase.replace(/("|'|^\s+|\s+$)/g,"")
+          phrase.replace(/("|^\s+|\s+$)/g,"")
                 .replace(this.config.stopwords,"")
-                .replace(/([-.*+?^${}()|[\]\/\\])/g, "\\$1")
+                .replace(/(['-.*+?^${}()|[\]\/\\])/g, "\\$1")
                 .replace(/\s+/g, "|");
 
       //filter-out anything shorter than 3 chars
@@ -154,6 +152,7 @@ javascript: (function () {
       tregex = ["([^,.?><]+)\\b(", phrase, ")"].join("");
 
       this.highlight(jQ('body'), regex, 'searchHilitrWord');
+      jQ('html,body').animate({scrollTop:0},0);
 
       o = [];
       jQ.each(searchHilitr.freq.f, function (k, v) {
@@ -161,9 +160,9 @@ javascript: (function () {
         sp = jQ('<span>');
         while (i < v) {
           if (i > 9) break;
-          jQ('<a>').text(++i).data('c', self.freq['p'][k][i]).bind('click', function () {
-            self.gotoLink(this);
-          }).appendTo(jQ(sp));
+          jQ('<a>').text(++i).click((function (n) {
+            return function(){self.slideTo(n);}
+          })(self.freq['p'][k][i])).appendTo(jQ(sp));
         }
         jQ('<li>')
           .append(jQ('<small>' + k + '<em>(' + v + ')</em></small>')
@@ -185,10 +184,10 @@ javascript: (function () {
         top = ratio * screen.height-70;
         if (top < 80) top = 80+i*2;
         jQ('<a class="scrollbarMark word'+ this.freq['w'][i]+'" title="Go to #' + i + '"></a>')
-          .data('c', i).css('top', top)
-          .bind('click', function () {
-            self.gotoLink(this);
-          })
+          .css('top', top)
+          .click((function(n){
+            return function(){self.slideTo(n);}
+          })(i))
         .appendTo("body");
       }
       this.attachShortcuts();
@@ -308,6 +307,12 @@ javascript: (function () {
                 font-size:12px;\
                 cursor:pointer;\
                 color:#999;\
+                text-decoration:none;\
+                text-shadow:1px 1px 1px #000;\
+             }\
+            .searchHilitrContainer li span a:hover{\
+                text-shadow:none;\
+                color:#fff;\
              }\
             .searchHilitrContainer li small{\
                 padding:3px 6px;\
@@ -340,6 +345,7 @@ javascript: (function () {
             }\
             #searchHilitrInfo input{\
                 padding:7px;\
+                height:auto;\
             }\
             #searchHilitrInfo input.txt{\
                 padding:8px;margin:10px 7px 2px 0px;\
@@ -373,6 +379,10 @@ javascript: (function () {
                 font-weight:bold;\
                 font-size:125%;\
                 color:red;\
+             }\
+            body.enableHilite .searchHilitrWord.current:before{\
+                content: '~';\
+                position:relative;left:-4px;\
              }\
             .scrollbarMark{\
                 position:fixed;\
