@@ -1,6 +1,6 @@
 
 /***********************************************
- searchHilitr v. 1.0 --- Highlight search keywords
+ searchHilitr v. 0.1 --- Highlight search keywords
  -- Optimised for bookmarklet use..
  http://www.smallmeans.com/tools/searchHilitr
 
