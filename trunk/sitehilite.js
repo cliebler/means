@@ -5,7 +5,7 @@
  http://www.smallmeans.com/tools/searchHilitr
 
  Copyright (c) 2009 smallmeans.com
- Revision date: 29 Oct 2009
+ First revision: 29 Oct 2009
 ***********************************************/
 
 javascript: (function () {
@@ -26,12 +26,13 @@ javascript: (function () {
       f: {},
       p: {},
       c: {},
-      w: {}
+      w: []
     },
     wrap: function (klass, needle) {
       n = needle.toLowerCase();
       this.count++;
-      //this.freq['f'][n]=this.freq['f'][n]?++this.freq['f'][n]:1;
+      //counting frequencies, succession of words
+     // and indexing first and subsequent occurences
       if (this.freq['f'][n]) {
         this.freq['f'][n]++;
         this.freq['p'][n][this.freq['f'][n]] = this.count;
@@ -41,7 +42,7 @@ javascript: (function () {
         this.freq['c'][n] = ++this.wcount;
         this.freq['f'][n] = 1;
       }
-      this.freq['w'][this.count]=this.freq['c'][n];
+      this.freq['w'].push(this.freq['c'][n]);
       return ['<span class="',
                klass, ' hilite', this.count, ' word', this.freq['c'][n], '"',
                'title="', needle,' #', this.count, '"', '>',needle, '</span>']
@@ -126,8 +127,8 @@ javascript: (function () {
       tregex = ["([^,.?><]+)\\b(", phrase, ")"].join("");
       //console.log(regex,'--',needles,'--',phrase)
 
-      this.highlight(jQ('body'), regex, '_hiliteword');
       jQ('html,body').animate({scrollTop:0},0);
+      this.highlight(jQ('body'), regex, '_hiliteword');
 
       o = [];
       jQ.each(searchHilitr.freq.f, function (k, v) {
@@ -164,7 +165,7 @@ javascript: (function () {
           .click((function(n){
             return function(){self.slideTo(n, true);}
           })(i))
-          .addClass('scrollbarMark word'+this.freq['w'][i])
+          .addClass('scrollbarMark word'+this.freq['w'][i-1])
         .appendTo("body");
       }
       this.attachShortcuts();
