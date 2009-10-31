@@ -11,6 +11,7 @@
 javascript: (function () {
   searchHilitr = {
     config:{
+      position:'top',
       isCasesensitive:false,
       showTopMenu: true,
       enableshortcuts: true,
@@ -119,7 +120,7 @@ javascript: (function () {
       //filter-out anything shorter than 3 chars
       if(needles.length<2|phrase.length<2) return;
       needles = jQ.makeArray(jQ(needles.split('|')).filter(function () {
-                   return this.length > 2
+                   return this.length > 2 && !/^\d+$/.test(this)
                 })).join("|");
 
       regex = new RegExp('(<[^>]*>)|\\b(' + needles + ')', this.config.isCasesensitive ? 'g' : 'ig');
@@ -127,8 +128,10 @@ javascript: (function () {
       tregex = ["([^,.?><]+)\\b(", phrase, ")"].join("");
       //console.log(regex,'--',needles,'--',phrase)
 
-      jQ('html,body').animate({scrollTop:0},0);
+console.time('regex timer');
       this.highlight(jQ('body'), regex, '_hiliteword');
+console.timeEnd('regex timer');
+      jQ('html,body').animate({scrollTop:0},0);
 
       o = [];
       jQ.each(searchHilitr.freq.f, function (k, v) {
@@ -261,6 +264,8 @@ javascript: (function () {
             body.colorify.enableHilite .word4{background-color: #A0FFFF !important}\
             body.colorify.enableHilite .word5{background-color: #ff6666 !important}\
             body.colorify.enableHilite .word6{background-color: #3333ff !important}\
+            body.colorify.enableHilite .word7{background-color: #964B00 !important}\
+            body.colorify.enableHilite .word8{background-color: #00FF00 !important;color:#999}\
             ._hiliteCont{\
                 position:fixed;\
                 background-color:#333;\
@@ -296,7 +301,7 @@ javascript: (function () {
                 display:block;\
                 line-height:12px;\
              }\
-            ._hiliteCont li._hiliteOptions span{\
+            body ul._hiliteCont li._hiliteOptions label span{\
                 display:inline;color:#888888 !important;border:0 none !important;\
                 background:transparent !important;padding:0 !important;\
              }\
