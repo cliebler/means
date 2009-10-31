@@ -67,7 +67,7 @@ javascript: (function () {
     dismiss: function(){
       //tear down Rome and head east..
       jQ('body').removeClass('searchHilitrEnabled enableHilite enableshortcuts showHilitrMenu');
-      jQ('.searchHilitrContainer,#searchHilitrInfo,#searchHilitrCSS').remove();
+      jQ('._hiliteCont,#searchHilitrInfo,#searchHilitrCSS').remove();
       document.onkeydown=this.oldOnkey;
     },
     extract: function (url) {
@@ -97,15 +97,13 @@ javascript: (function () {
       this.slideTo(--this.currIndex);
     },
     slideTo: function (i, isClick) {
-console.log('going to:'+i);
-      var offset = this.pos[i],
-      b = jQ('body');
+      var offset = this.pos[i], b=jQ('body');
       jQ('html,body').stop().animate({scrollTop: offset-90},800);
-      jQ('.searchHilitrWord,.searchHilitrSntce').removeClass('current');
+      jQ('._hiliteword,._hiliteSntce').removeClass('current');
       if(jQ(b).hasClass('searchHilitrContextualize')){
-        jQ('.searchHilitrWord.hilite' + i).parent('.searchHilitrSntce').addClass('current');
+        jQ('._hiliteword.hilite' + i).parent('._hiliteSntce').addClass('current');
       }else{
-        jQ('.searchHilitrWord.hilite' + i).addClass('current');
+        jQ('._hiliteword.hilite' + i).addClass('current');
       }
       if(isClick){this.currIndex = i;}
     },
@@ -113,27 +111,15 @@ console.log('going to:'+i);
       phrase = what || this.extract(document.referrer) || this.extract(document.location);
       if (!phrase) {
         if(!rerun){
-          var a=jQ('<a>nothing happened</a>').click(function(){self.dismiss();});
-          var go=jQ("<input type='button' value='Go!'>")
-                  .bind('click',function(){
-                     self.search(jQ(this).prev().val(),true);
-                     jQ('#searchHilitrInfo').hide();
-                     jQ('.searchHilitrContainer').show();
-                 });
-          jQ('#searchHilitrInfo')
-            .append("Oops... Couldn't find the word you were looking for..")
-            .append("<br/>Pretend ").append(a)
-            .append(" or enter your search below:<br/><input class='txt' type='text' size='23'>")
-            .append(go);
+          this.notfound();
         }
-        jQ('#searchHilitrInfo').show();
-        jQ('.searchHilitrContainer').hide();
-        jQ('#searchHilitrInfo input:eq(0)').focus();
+        jQ('._hiliteCont').hide();
+        jQ('#_hiliteInfo').show().find('input:eq(0)').focus();;
         return;
       }else{
-        jQ('.searchHilitrContainer li:not(.searchHilitrContextLink)').remove();
-        jQ('#searchHilitrInfo').hide();
-        jQ('.searchHilitrContainer').show();
+        jQ('#_hiliteInfo').hide();
+        jQ('._hiliteCont').show()
+            .find('li:not(._hiliteOptions)').remove();
       }
       var needles=
           phrase.replace(/("|^\s+|\s+$)/g,"")
@@ -142,7 +128,7 @@ console.log('going to:'+i);
                 .replace(/\s+/g, "|");
 
       //filter-out anything shorter than 3 chars
-      if(phrase.length<2) return;
+      if(needles.length<2|phrase.length<2) return;
       needles = jQ.makeArray(jQ(needles.split('|')).filter(function () {
                    return this.length > 2
                 })).join("|");
@@ -150,8 +136,9 @@ console.log('going to:'+i);
       regex = new RegExp('(<[^>]*>)|\\b(' + needles + ')', this.config.isCasesensitive ? 'g' : 'ig');
       tregex = "([^,.?<>]*)\\b(site statistics|statistics|site)";
       tregex = ["([^,.?><]+)\\b(", phrase, ")"].join("");
+      //console.log(regex,'--',needles,'--',phrase)
 
-      this.highlight(jQ('body'), regex, 'searchHilitrWord');
+      this.highlight(jQ('body'), regex, '_hiliteword');
       jQ('html,body').animate({scrollTop:0},0);
 
       o = [];
@@ -161,14 +148,14 @@ console.log('going to:'+i);
         while (i < v) {
           if (i > 9) break;
           jQ('<a>').text(++i).click((function (n) {
-            return function(){self.slideTo(n);}
+            return function(){self.slideTo(n, true);}
           })(self.freq['p'][k][i])).appendTo(jQ(sp));
         }
         jQ('<li>')
           .append(jQ('<small>' + k + '<em>(' + v + ')</em></small>')
           .addClass('word' + self.freq['c'][k]))
           .append(sp)
-        .appendTo('.searchHilitrContainer')
+        .appendTo('._hiliteCont')
       });
 
       //scrollbar nav markers
@@ -176,7 +163,7 @@ console.log('going to:'+i);
       while (i < this.count) {
         var s=0;
         try{
-          o = jQ('.searchHilitrWord').eq(i++).position().top;
+          o = jQ('._hiliteword').eq(i++).position().top;
         }catch(aarrrgh){}
 
         this.pos[i] = o||1;
@@ -186,12 +173,12 @@ console.log('going to:'+i);
         jQ('<a class="scrollbarMark word'+ this.freq['w'][i]+'" title="Go to #' + i + '"></a>')
           .css('top', top)
           .click((function(n){
-            return function(){self.slideTo(n);}
+            return function(){self.slideTo(n, true);}
           })(i))
         .appendTo("body");
       }
       this.attachShortcuts();
-      jQ(".searchHilitrContainer li.searchHilitrContextLink label")
+      jQ("._hiliteCont li._hiliteOptions label")
           .eq(3).hide().end()
           .find('input').bind('change', function(){
             self.changeIsGonnaCome(jQ(this).attr('name'),jQ(this).attr('checked'));
@@ -200,13 +187,13 @@ console.log('going to:'+i);
     changeIsGonnaCome:function(change, hasCome){
       this.config[change]=hasCome;
       if(change=="enableHilite"){
-        var c=".searchHilitrContainer";
+        var c="._hiliteCont";
         if(hasCome){
           jQ(c).css('height','auto');
         }
         else{
           jQ(c).animate(
-               {height: "22px"}, 1000,
+               {height: "20px"}, 1000,
                 function(){
                  jQ('body').toggleClass(change);
                });return;
@@ -241,6 +228,21 @@ console.log('going to:'+i);
         }
       }
     },
+    notfound: function(){
+      var a=jQ('<a>nothing happened</a>')
+            .click(function(){self.dismiss();});
+      var b=jQ("<input type='button' value='Go!'>")
+              .bind('click',function(){
+                 self.search(jQ(this).prev().val(),true);
+                 jQ('#_hiliteInfo').hide();
+                 jQ('._hiliteCont').show();
+             });
+      jQ('#_hiliteInfo')
+        .append("Oops... Couldn't find the word you were looking for..")
+        .append("<br/>Pretend ").append(a)
+        .append(" or enter your search below:<br/><input class='txt' type='text' size='23'>")
+        .append(b);
+    },
     go: function (phrase){
       if(jQ('body').hasClass('searchHilitrEnabled')){
         return this.search(phrase,true);
@@ -253,45 +255,46 @@ console.log('going to:'+i);
             body.searchHilitrColorify.enableHilite .word4{background-color: #A0FFFF !important}\
             body.searchHilitrColorify.enableHilite .word5{background-color: #ff6666 !important}\
             body.searchHilitrColorify.enableHilite .word6{background-color: #3333ff !important}\
-            .searchHilitrContainer{\
+            ._hiliteCont{\
                 position:fixed;\
                 background-color:#333;\
                 width:100%;\
                 top:0;margin:0;\
                 padding:0 0 5px;\
-                display:none;overflow:hidden;\
+                overflow:hidden;\
                 line-height:1;\
                 border-bottom:10px solid #DAD0C7;\
             }\
-            body.showHilitrMenu .searchHilitrContainer{\
+            body.showHilitrMenu ._hiliteCont{\
                 display:block;\
             }\
-            body.enableHilite .searchHilitrContainer{\
+            body.enableHilite ._hiliteCont{\
             }\
-            .searchHilitrContainer li{\
+            ._hiliteCont li{\
                 float:left;\
                 padding:6px 3px;\
                 margin:2px;\
                 background:#444 !important;\
                 xline-height:1.4em;\
-                overflow:hidden;display:none;\
+                overflow:hidden;\
                 text-transform:capitalize;\
              }\
-           body.enableHilite .searchHilitrContainer li{\
+           body.enableHilite ._hiliteCont li,\
+           body.enableHilite .scrollbarMark{\
                 color:#99f;display:block;\
              }\
-           body.searchHilitrColorify .searchHilitrContainer li{\
+           body.searchHilitrColorify ._hiliteCont li{\
                 color:#666;\
              }\
-            .searchHilitrContainer li span{\
+            ._hiliteCont li span{\
                 display:block;\
                 line-height:12px;\
              }\
-            .searchHilitrContainer li.searchHilitrContextLink span{\
+            ._hiliteCont li._hiliteOptions span{\
                 display:inline;color:#888888 !important;border:0 none !important;\
                 background:transparent !important;padding:0 !important;\
              }\
-            .searchHilitrContainer li label{\
+            ._hiliteCont li label{\
                 display:block;color:#999;\
                 text-align:left;\
                 text-transform:none;\
@@ -299,7 +302,7 @@ console.log('going to:'+i);
                 float:none;width:auto;\
                 margin:0;padding:0;height:17px;\
              }\
-            .searchHilitrContainer li span a{\
+            ._hiliteCont li span a{\
                 padding:1px 3px;\
                 margin:0 2px;\
                 background-color:#ddd;\
@@ -310,23 +313,22 @@ console.log('going to:'+i);
                 text-decoration:none;\
                 text-shadow:1px 1px 1px #000;\
              }\
-            .searchHilitrContainer li span a:hover{\
+            ._hiliteCont li span a:hover{\
                 text-shadow:none;\
                 color:#fff;\
              }\
-            .searchHilitrContainer li small{\
+            ._hiliteCont li small{\
                 padding:3px 6px;\
                 display:block;\
                 margin-bottom:5px;\
                 background-color:x#ffff99;font-size:24px;\
              }\
-            .searchHilitrContainer li small em{\
+            ._hiliteCont li small em{\
                 margin-left:8px;background:transparent;\
                 font-weight:normal;padding:0;\
                 vertical-align:top;font-size:11px;\
              }\
-            #searchHilitrInfo{\
-                display:none;\
+            #_hiliteInfo{\
                 color:#FFF5DC;\
                 width:100%;\
                 line-height:28px;\
@@ -337,52 +339,53 @@ console.log('going to:'+i);
                  position: fixed;\
                  font-size:20px;\
             }\
-            #searchHilitrInfo a{\
+            #_hiliteInfo a{\
                 color:#CC0000;cursor:pointer;\
             }\
-            #searchHilitrInfo a,#searchHilitrInfo a:hover{\
+            #_hiliteInfo a,#_hiliteInfo a:hover{\
                 font-size:100%;\
             }\
-            #searchHilitrInfo input{\
+            #_hiliteInfo input{\
                 padding:7px;\
                 height:auto;\
+                width:auto;\
+                display:inline;\
             }\
-            #searchHilitrInfo input.txt{\
+            #_hiliteInfo input.txt{\
                 padding:8px;margin:10px 7px 2px 0px;\
             }\
-              #searchHilitrInfo,.searchHilitrContainer,.scrollbarMark{\
+              #_hiliteInfo,._hiliteCont,.scrollbarMark{\
                 z-index:999999;\
               }\
-            body.searchHilitrContextualize.enableHilite .searchHilitrSntce,\
-            body.enableHilite .searchHilitrWord{\
+            body.searchHilitrContextualize.enableHilite ._hiliteSntce,\
+            body.enableHilite ._hiliteword{\
                 background:#ff0 !important;\
                 padding:2px 5px 2px 5px !important;\
                 -moz-border-radius:2px;color:#000;\
                 border:1px solid #aaa !important;\
                 display:inline !important;\
              }\
-            body.searchHilitrContextualize .searchHilitrSntce.current{\
+            body.searchHilitrContextualize ._hiliteSntce.current{\
                 border:1px solid red;\
              }\
-            body.searchHilitrContextualize .searchHilitrSntce.current .searchHilitrWord{\
+            body.searchHilitrContextualize ._hiliteSntce.current ._hiliteword{\
                 border:none;\
              }\
-            body.searchHilitrContextualize .searchHilitrSntce{\
+            body.searchHilitrContextualize ._hiliteSntce{\
                 xbackground-color:gold;\
              }\
-            body.searchHilitrContextualize .searchHilitrWord{\
+            body.searchHilitrContextualize ._hiliteword{\
                 background-color:red;\
                 padding:2px;\
              }\
-            body.enableHilite .searchHilitrWord.current{\
+            body.enableHilite ._hiliteword.current{\
                 border-color:#555 !important;\
                 font-weight:bold;\
                 font-size:125%;\
                 color:red;\
              }\
-            body.enableHilite .searchHilitrWord.current:before{\
-                content: '~';\
-                position:relative;left:-4px;\
+            body.enableHilite ._hiliteword.current:before{\
+                _content: '|';\
              }\
             .scrollbarMark{\
                 position:fixed;\
@@ -392,23 +395,26 @@ console.log('going to:'+i);
                 background-color:gold;\
                 cursor:pointer;\
              }\
-            .searchHilitrContainer .searchHilitrContextLink{\
+            ._hiliteCont ._hiliteOptions{\
                 float:right;display:block;\
                 font-size:12px;\
                 margin:3px 5px;\
                 padding:1px 3px 6px;\
              }\
-            .searchHilitrContainer .searchHilitrContextLink input{\
+            ._hiliteCont ._hiliteOptions input{\
                 vertical-align:sub;\
                 margin:5px 3px 5px 5px;\
                 padding:0;\
              }\
-            .searchHilitrContainer .searchHilitrContextLink input{\
+            ._hiliteCont ._hiliteOptions input{\
                 display:inline !important;background:transparent !important;\
+             }\
+            .scrollbarMark,._hiliteCont,._hiliteCont li,#_hiliteInfo{\
+                display:none;\
              }\
            ";
       jQ('<style id="searchHilitrCSS" type="text/css"></style>').text(css).appendTo("head");
-      jQ('<ul class="searchHilitrContainer"></ul><div id="searchHilitrInfo"></div>').prependTo("body");
+      jQ('<ul class="_hiliteCont"></ul><div id="_hiliteInfo"></div>').prependTo("body");
       jQ('<li>')
         .append(
           '<label><input type="checkbox" name="enableHilite" checked>Highlight ON|OFF</label>'+
@@ -417,8 +423,8 @@ console.log('going to:'+i);
           '<label><input type="checkbox" name="searchHilitrColorify">Colors, please!</label>'+
           '<label ><input type="checkbox" name="searchHilitrContextualize" disabled>Show in context</label>'
         )
-      .addClass('searchHilitrContextLink')
-      .appendTo(".searchHilitrContainer");
+      .addClass('_hiliteOptions')
+      .appendTo("._hiliteCont");
       jQuery('script').remove();
       jQ('body').addClass('searchHilitrEnabled enableHilite enableshortcuts');
       if (this.config.showTopMenu) {
