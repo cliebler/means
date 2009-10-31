@@ -1,6 +1,6 @@
 
 /***********************************************
- searchHilitr v. 0.1 --- Highlight search keywords
+ sitehilite v. 0.1 --- Highlight search keywords
  -- Optimised for bookmarklet use..
  http://www.smallmeans.com/tools/searchHilitr
 
@@ -79,7 +79,7 @@ javascript: (function () {
           if (/^cache/.test(v)) {
             v = v.substr(v.indexOf('+') + 1)
           }
-          s = unescape(v.replace(/\+/g, ' '));
+          s = unescape(v).replace(/[,\+]+/g, ' ');
         }
       });
       return s;
@@ -122,10 +122,10 @@ javascript: (function () {
             .find('li:not(._hiliteOptions)').remove();
       }
       var needles=
-          phrase.replace(/("|^\s+|\s+$)/g,"")
+          phrase.replace(/("|^\s+|\s+$)/g,"") //unquote,trim
                 .replace(this.config.stopwords,"")
-                .replace(/(['-.*+?^${}()|[\]\/\\])/g, "\\$1")
-                .replace(/\s+/g, "|");
+                .replace(/(['-.*+?^${}()|[\]\/\\])/g, "\\$1")//escape some
+                .replace(/[\s,]+/g, "|");//expand
 
       //filter-out anything shorter than 3 chars
       if(needles.length<2|phrase.length<2) return;
@@ -170,11 +170,13 @@ javascript: (function () {
         ratio = o/bh;
         top = ratio * screen.height-70;
         if (top < 80) top = 80+i*2;
-        jQ('<a class="scrollbarMark word'+ this.freq['w'][i]+'" title="Go to #' + i + '"></a>')
+        jQ('<a>')
           .css('top', top)
+          .attr('title', 'Go to #'+i)
           .click((function(n){
             return function(){self.slideTo(n, true);}
           })(i))
+          .addClass('scrollbarMark word'+this.freq['w'][i])
         .appendTo("body");
       }
       this.attachShortcuts();
@@ -193,10 +195,10 @@ javascript: (function () {
         }
         else{
           jQ(c).animate(
-               {height: "20px"}, 1000,
-                function(){
-                 jQ('body').toggleClass(change);
-               });return;
+            {height: "20px"}, 1000,
+             function(){
+              jQ('body').toggleClass(change);
+            });return;
         }
       }
       jQ('body').toggleClass(change);
@@ -249,12 +251,12 @@ javascript: (function () {
       }
       var css = "\
             body{margin-top:78px;position:relative;}\
-            body.searchHilitrColorify.enableHilite .word1{background-color: #FFFF66 !important}\
-            body.searchHilitrColorify.enableHilite .word3{background-color: #88cc00 !important}\
-            body.searchHilitrColorify.enableHilite .word2{background-color: #FF99FF !important}\
-            body.searchHilitrColorify.enableHilite .word4{background-color: #A0FFFF !important}\
-            body.searchHilitrColorify.enableHilite .word5{background-color: #ff6666 !important}\
-            body.searchHilitrColorify.enableHilite .word6{background-color: #3333ff !important}\
+            body.colorify.enableHilite .word1{background-color: #FFFF66 !important}\
+            body.colorify.enableHilite .word3{background-color: #88cc00 !important}\
+            body.colorify.enableHilite .word2{background-color: #FF99FF !important}\
+            body.colorify.enableHilite .word4{background-color: #A0FFFF !important}\
+            body.colorify.enableHilite .word5{background-color: #ff6666 !important}\
+            body.colorify.enableHilite .word6{background-color: #3333ff !important}\
             ._hiliteCont{\
                 position:fixed;\
                 background-color:#333;\
@@ -283,7 +285,7 @@ javascript: (function () {
            body.enableHilite .scrollbarMark{\
                 color:#99f;display:block;\
              }\
-           body.searchHilitrColorify ._hiliteCont li{\
+           body.colorify ._hiliteCont li{\
                 color:#666;\
              }\
             ._hiliteCont li span{\
@@ -420,7 +422,7 @@ javascript: (function () {
           '<label><input type="checkbox" name="enableHilite" checked>Highlight ON|OFF</label>'+
           '<label title="Use the LEFT,RIGHT arrow keys to move back and forth">'+
           '<input type="checkbox" name="enableshortcuts" checked>Use arrow keys</label>'+
-          '<label><input type="checkbox" name="searchHilitrColorify">Colors, please!</label>'+
+          '<label><input type="checkbox" name="colorify">Colors, please!</label>'+
           '<label ><input type="checkbox" name="searchHilitrContextualize" disabled>Show in context</label>'
         )
       .addClass('_hiliteOptions')
