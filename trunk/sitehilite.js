@@ -15,7 +15,8 @@ javascript: (function () {
       showTopMenu: true,
       enableshortcuts: true,
       //english stop words with length>2
-      stopwords: /\b(about|and|are|com|you|for|from|how|that|the|this|was|what|when|where|who|will|with|und|the|www|define:)\b/gi,
+      stopwords: "about|and|are|com|you|for|from|how|that|the"+
+                 "this|was|what|when|where|who|will|with|und|the|www|define:",
     },
     pos: [],
     currIndex: 0,
@@ -27,20 +28,6 @@ javascript: (function () {
       c: {},
       w: {}
     },
-    init: function () {
-      self = this;
-      if (typeof jQuery == 'undefined'||jQuery.prototype.jquery<"1.2.6") {
-        this.require(
-          'http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js',
-          function () {
-           jQ = jQuery.noConflict();
-           self.go();
-        });
-      } else {
-        jQ = jQuery;
-        this.go();
-      }
-    },
     wrap: function (klass, needle) {
       n = needle.toLowerCase();
       this.count++;
@@ -49,15 +36,16 @@ javascript: (function () {
         this.freq['f'][n]++;
         this.freq['p'][n][this.freq['f'][n]] = this.count;
       } else {
-        this.freq['f'][n] = 1;
         this.freq['p'][n] = {};
         this.freq['p'][n][1] = this.count;
         this.freq['c'][n] = ++this.wcount;
+        this.freq['f'][n] = 1;
       }
       this.freq['w'][this.count]=this.freq['c'][n];
       return ['<span class="',
                klass, ' hilite', this.count, ' word', this.freq['c'][n], '"',
-               'title="', needle,' #', this.count, '"', '>',needle, '</span>'].join("");
+               'title="', needle,' #', this.count, '"', '>',needle, '</span>']
+             .join("");
     },
     highlight: function (context, regex, klass) {
       return jQ(context).html(jQ(context).html().replace(regex, function (a, b, c) {
@@ -65,7 +53,7 @@ javascript: (function () {
       }));
     },
     dismiss: function(){
-      //tear down Rome and head east..
+      //tear down and head east..
       jQ('body').removeClass('searchHilitrEnabled enableHilite enableshortcuts showHilitrMenu');
       jQ('._hiliteCont,#searchHilitrInfo,#searchHilitrCSS').remove();
       document.onkeydown=this.oldOnkey;
@@ -244,6 +232,21 @@ javascript: (function () {
         .append("<br/>Pretend ").append(a)
         .append(" or enter your search below:<br/><input class='txt' type='text' size='23'>")
         .append(b);
+    },
+    init: function () {
+      self = this;
+      this.config.stopwords=new RegExp('\\b('+this.config.stopwords+')\\b','ig');
+      if (typeof jQuery == 'undefined'||jQuery.prototype.jquery<"1.2.6") {
+        this.require(
+          'http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js',
+          function () {
+           jQ = jQuery.noConflict();
+           self.go();
+        });
+      } else {
+        jQ = jQuery;
+        this.go();
+      }
     },
     go: function (phrase){
       if(jQ('body').hasClass('searchHilitrEnabled')){
