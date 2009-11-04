@@ -32,15 +32,11 @@ javascript: (function () {
        c: {},
        w: []
     },
-    wrap: function (klass, tag, needle, siblings,i) {
-      if(i==siblings-1){//beginning of textnode
-        this.nodes+=siblings;
-      }
+    wrap: function (klass, tag, needle) {
       //counting frequencies, succession of words
      // and indexing first and subsequent occurences
       var w = needle.data.toLowerCase();
-      var n=(this.nodes+i)-siblings+1;
-      this.count++;
+      n=++this.count
       if (this.stats['f'][w]) {
         this.stats['f'][w]++;
         this.stats['p'][w][this.stats['f'][w]] = n;
@@ -50,16 +46,14 @@ javascript: (function () {
         this.stats['c'][w] = ++this.wcount;
         this.stats['f'][w] = 1;
       }
-
       this.stats['w'][n]=this.stats['c'][w];
       return jQ(['<'+tag+' class="',
                klass, ' hilite', n, ' word', this.stats['c'][w], '"',
                'title="', w,' is match #',n,'"', '/>']
              .join("")).append(needle);
     },
-    //hat tip to BobInce @ u.nu/7d2r3
     wrapWordsInDescendants:function(element, needleRegex, tagName, className) {
-      for(var i=0,c=element.childNodes.length; i<c;i++){
+      for(var i= element.childNodes.length; i-->0;){
         var child=element.childNodes[i];
         if(child.nodeType==1){ // Node.ELEMENT_NODE
           this.wrapWordsInDescendants(child, needleRegex, tagName, className);
@@ -69,17 +63,17 @@ javascript: (function () {
         }
       }
     },
+    //hat tip to BobInce @ u.nu/7d2r3    
     wrapWordsInText:function(node, needleRegex, tagName, className) {
       var indices=[], match;
       while (match= needleRegex.exec(node.data)){
         indices.push([match.index, match.index+match[0].length]);
       }
-      for(var i=sibl=indices.length; i-->0;){
+      for(var i=indices.length; i-->0;){
         node.splitText(indices[i][1]);
-        var s=node.data, txt=node.splitText(indices[i][0]);
-        if(txt.data.toString()==s.toString() && node.data.length==0) continue;
-        var e=this.wrap(className, tagName, txt, sibl, i);
-        jQ(node.nextSibling).before(e);
+        var txt=node.splitText(indices[i][0]);
+        var e=this.wrap(className, tagName, txt);
+        jQ(node).after(e);
       }
     },
     highlight: function (context, needleRegex, tag, klass){
@@ -94,9 +88,10 @@ javascript: (function () {
     },
     dismiss: function(){
       //tear down and head east..
-      jQ('body').removeClass('sitehiliteEnabled enableHilite enableshortcuts showHilitrMenu');
+      document.onkeydown=this.oldOnkey;      
       jQ('._hiliteCont,#sitehiliteInfo,#sitehiliteCSS').remove();
-      document.onkeydown=this.oldOnkey;
+      jQ('body').removeClass('sitehiliteEnabled enableHilite'+' enableshortcuts showHilitrMenu');
+      
     },
     extract: function (url) {
       var where = url.toString(),s=null;
@@ -112,11 +107,11 @@ javascript: (function () {
       });
       return s;
     },
-    nextInstance: function () {
+    prevmatch: function () {
       this.currIndex < this.count && 
        this.slideTo(++this.currIndex);
     },
-    prevInstance: function () {
+    nextmatch: function () {
       this.currIndex>1 &&
        this.slideTo(--this.currIndex);
     },
@@ -126,7 +121,7 @@ javascript: (function () {
          .animate({scrollTop: offset},800);
       jQ('._hiliteword')
          .removeClass('current')
-         .eq(i-1).addClass('current');
+         .filter('.hilite'+i).addClass('current');
       if(isClick){this.currIndex = i;}         
     },
     search: function (what,rerun) {
@@ -175,13 +170,14 @@ javascript: (function () {
       } 
       var o = [];
       jQ.each(this.stats.f, function (k, v) {
+        self.stats['p'][k].reverse();
         var i=0, sp="", d = [];
         sp = jQ('<span>');
         while (i++ < v) {
           if (i > 10) break;
           jQ('<a>').text(i).click((function (n) {
             return function(){self.slideTo(n, true);}
-          })(self.stats['p'][k].sort(function(a,b){return (a-b);})[i-1])).appendTo(jQ(sp));
+          })(self.stats['p'][k][i-1])).appendTo(jQ(sp));
         }
         jQ('<li>')
           .append(jQ('<small>' + k + '<em>(' + v + ')</em></small>')
@@ -191,20 +187,20 @@ javascript: (function () {
       });
 
       //scrollbar nav markers
-      var i=ratio=o=0,bh = jQ(document).height();
-      while (i++ < this.count) {
+      var ratio=o=0,bh = jQ(document).height(),i=this.count+1;
+      while (i-->1) {
         var s=0;
         try{
-          o = jQ('._hiliteword').eq(i-1).position().top;
+          o = jQ('.hilite'+i).position().top;
         }catch(aarrrgh){o=0}
 
         this.pos[i] = o||1;
         ratio = o/bh;
-        top = ratio * screen.height-70;
-        if (top < 80) top = 80+i*2;
+        top = ratio * document.body.clientHeight;
+        if (top < 80) top = 80+Math.random()*10;
         jQ('<a>')
           .css('top', top)
-          .attr('title', 'Go to #'+i)
+          .attr('title', 'Go to match #'+i)
           .click((function(n){
             return function(){self.slideTo(n, true);}
           })(i))
@@ -257,10 +253,10 @@ javascript: (function () {
           return;
         }
         if(a.keyCode == 37) {//left arrow
-          self.prevInstance();
+          self.prevmatch();
         }
         else if(a.keyCode == 39) {//right arrow
-          self.nextInstance();
+          self.nextmatch();
         }
       }
     },
@@ -312,7 +308,8 @@ javascript: (function () {
             body.colorify.enableHilite .word5{background-color: #ff6666 !important}\
             body.colorify.enableHilite .word6{background-color: #3333ff !important}\
             body.colorify.enableHilite .word7{background-color: #964B00 !important}\
-            body.colorify.enableHilite .word8{background-color: #00FF00 !important;color:#999}\
+            body.colorify.enableHilite .word8{background-color: #00FF00 !important;}\
+            body.colorify.enableHilite .word8,body.colorify.enableHilite .word6{color:#000 !important}\
             ._hiliteCont{\
                 position:fixed;\
                 background-color:#333;\
