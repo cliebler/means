@@ -16,7 +16,7 @@ javascript: (function(){
       beginsWith:true,
       endsWith:false,
       content:'body',
-      colorify:true,
+      colorify:false,
       minLength:3,
       navMenu:{
         show: true,
@@ -203,15 +203,17 @@ javascript: (function(){
           .addClass('scrollbarMark word'+this.stats['w'][i])
         .appendTo("body");
       }
-      this.attachKeys();
-      if(this.config.callback){
-        this.config.callback.call();
-      }
       jQ("._hiliteCont li._hiliteOptions label")
           .eq(3).hide().end()
           .find('input').bind('change', function(){
             self.changeIsGonnaCome(jQ(this).attr('name'),jQ(this).attr('checked'));
           });
+      this.attachKeys();
+      if(this.config.callback){
+        try{
+          this.config.callback.call();
+        }catch(aarrrgh){alert('Your callback function is a no-go:'+aarrrgh)}
+      }
     },
     changeIsGonnaCome:function(change, hasCome){
       this.config[change]=hasCome;
