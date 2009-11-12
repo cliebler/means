@@ -209,6 +209,7 @@ javascript: (function(){
             self.changeIsGonnaCome(jQ(this).attr('name'),jQ(this).attr('checked'));
           });
       this.attachKeys();
+      this.currIndex=this.count+1;
       if(this.config.callback){
         try{
           this.config.callback.call();
@@ -269,7 +270,7 @@ javascript: (function(){
     },
     init: function (conf,phrase){
       self = this;    
-      this.count=this.wcount=this.nodes=this.currIndex=0;      
+      this.count=this.wcount=this.nodes=0;
       this.config.stopwords=new RegExp('\\b('+this.config.stopwords+')\\b','ig');
       for(i in conf){
         this.config[i]=conf[i];
