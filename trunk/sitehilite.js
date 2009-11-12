@@ -12,7 +12,7 @@ javascript: (function(){
     config:{
       isCasesensitive:false,
       enableArrowKeys: true,
-      enableInput:false,
+      enableInput:true,
       beginsWith:true,
       endsWith:false,
       content:'body',
@@ -145,18 +145,21 @@ javascript: (function(){
             }));
     
     },    
-    search: function (needles) {    
+    search: function (phrase) {    
       var sense=this.config.isCasesensitive ? 'g' : 'ig';
       var pre =this.config.beginsWith?'\\b':'';
       var post=this.config.endsWith?'\\b':'';
-      var regex = new RegExp([pre, '(' + needles.join("|") + ')',post].join(""), sense);
-      //regex=/\b((lorem( ?ipsum( ?dolor( ?sap( ?safari)?)?)?)?)|(ipsum|dolor|sap|safari))/gi
-      //var regex = new RegExp(['(<[^>]*>)|',pre..
-      this.log(regex.toString(),'--',needles)
-      //console.time('DOMWalkingTimer');
-      this.highlight(jQ(this.config.content), regex, 'span', '_hiliteword');         
-      //console.timeEnd('DOMWalkingTimer');
-      jQ('html,body').animate({scrollTop:0},0);
+
+      if(phrase){
+        var needles=this.getNeedles(phrase);
+        var regex = new RegExp([pre, '(' + needles.join("|") + ')',post].join(""), sense);
+        this.log(regex.toString(),'--',needles)      
+        this.highlight(jQ(this.config.content), regex, 'span', '_hiliteword');
+        //regex=/\b((lorem( ?ipsum( ?dolor( ?sap( ?safari)?)?)?)?)|(ipsum|dolor|sap|safari))/gi
+        //var regex = new RegExp(['(<[^>]*>)|',pre..
+        //console.timeEnd('DOMWalkingTimer');
+        jQ('html,body').animate({scrollTop:0},0);
+      }       
 
       if(this.count<1){
         if(this.config.enableInput){
@@ -303,33 +306,19 @@ javascript: (function(){
                 "<input title='Partial words are OK, separate by space'"+
                 " class='txt' type='text' size='23'>")
         .append(b).toggle(reveal);
+        jQ('._hiliteCont').hide();
     },
     isbkmklet:true,
     go: function (what){
       var phrase = what || this.extract(document.referrer) || this.extract(document.location);
-      if (!phrase) {
-        if(this.config.enableInput){
-          if(!rerun){
-            this.showDialog();
-          }
-          jQ('#sitehiliteInfo').show().find('input:eq(0)').focus();
-          jQ('._hiliteCont').hide();
-        }else{
-          //this.dismiss();
-        }
-        return;
-      }else{
+      if(phrase){
         jQ('#sitehiliteInfo').hide();
         jQ('._hiliteword').attr('class','');
         jQ('._hiliteCont').show()
             .find('li:not(._hiliteOptions)').remove();
       }
-      var needles=this.getNeedles(phrase);
-      if(needles.length<1){
-        return;
-      } 
       if(jQ('body').hasClass('sitehiliteEnabled')){
-        return this.search(needles,true);
+        return this.search(phrase,true);
       }
       //<><![CDATA[..]]></>.toString();
       var css = "\
@@ -475,6 +464,7 @@ javascript: (function(){
                 -moz-border-radius:2px;color:#000;\
                 border:1px solid #aaa !important;\
                 display:inline !important;\
+                font-size:100%;\
             }\
             body.enableHilite ._hiliteword.current{\
                 border-color:red !important;\
@@ -487,7 +477,7 @@ javascript: (function(){
             }\
             .scrollbarMark{\
                 position:fixed;\
-                right:3px;\
+                right:3px;overflow:auto;\
                 border-bottom:1px solid #CC0033;\
                 padding:3px 6px;\
                 background-color:gold;\
@@ -516,9 +506,8 @@ javascript: (function(){
                     (this.config.navMenu.show?' showHilitrMenu':'')+
                     (this.config.colorify?' colorify':'');
       jQ('body').addClass(klass);
-      this.search(needles);
+      this.search(phrase);
     }
   }
 })();
 sitehilite.init();
-
