@@ -7,15 +7,18 @@
  First revision: 29 Oct 2009
 ***********************************************/
 
-javascript: (function () {
+javascript: (function(){
   sitehilite = {
     config:{
       isCasesensitive:false,
-      beginsWith:true,   //if both are set to true, then only
-      endWith:false,     //WHOLE words are matched (no partial)
-      enableshortcuts: true,
+      enableArrowKeys: true,
+      enableInput:false,
+      beginsWith:true,
+      endsWith:false,
+      content:'body',
+      colorify:true,
       minLength:3,
-      OptionsMenu:{
+      navMenu:{
         show: true,
         position:'top'
       },
@@ -23,7 +26,6 @@ javascript: (function () {
       //english stop words with length>2
       stopwords: "about|and|are|com|xyou|for|from|how|that|then|the"+
                  "this|was|what|when|where|who|will|with|und|the|www|define:",
-
     },
     pos :[],    
     stats:{
@@ -36,11 +38,11 @@ javascript: (function () {
       //counting frequencies, succession of words
      // and indexing first and subsequent occurences
       var w = needle.data.toLowerCase();
-      n=++this.count
-      if (this.stats['f'][w]) {
+      n=++this.count;
+      if(this.stats['f'][w]) {
         this.stats['f'][w]++;
         this.stats['p'][w][this.stats['f'][w]] = n;
-      } else {
+      }else{
         this.stats['p'][w] = [];
         this.stats['p'][w][1] = n;
         this.stats['c'][w] = ++this.wcount;
@@ -49,7 +51,7 @@ javascript: (function () {
       this.stats['w'][n]=this.stats['c'][w];
       return jQ(['<'+tag+' class="',
                klass, ' hilite', n, ' word', this.stats['c'][w], '"',
-               'title="', w,' is match #',n,'"', '/>']
+               'xtitle="', w,' is match #',n,'"', '/>']
              .join("")).append(needle);
     },
     wrapWordsInDescendants:function(element, needleRegex, tagName, className) {
@@ -59,7 +61,7 @@ javascript: (function () {
           this.wrapWordsInDescendants(child, needleRegex, tagName, className);
         }    
         else if(child.nodeType==3){ // Node.TEXT_NODE
-           this.wrapWordsInText(child, needleRegex, tagName, className);
+          this.wrapWordsInText(child, needleRegex, tagName, className);
         }
       }
     },
@@ -90,7 +92,8 @@ javascript: (function () {
       //tear down and head east..
       document.onkeydown=this.oldOnkey;      
       jQ('._hiliteCont,#sitehiliteInfo,#sitehiliteCSS').remove();
-      jQ('body').removeClass('sitehiliteEnabled enableHilite'+' enableshortcuts showHilitrMenu');
+      jQ('body').removeClass('sitehiliteEnabled enableHilite '+
+                'enableArrowKeys showHilitrMenu hilitetop colorify');
       
     },
     extract: function (url) {
@@ -107,11 +110,11 @@ javascript: (function () {
       });
       return s;
     },
-    prevmatch: function () {
+    prevmatch: function(){
       this.currIndex < this.count && 
        this.slideTo(++this.currIndex);
     },
-    nextmatch: function () {
+    nextmatch: function(){
       this.currIndex>1 &&
        this.slideTo(--this.currIndex);
     },
@@ -124,48 +127,41 @@ javascript: (function () {
          .filter('.hilite'+i).addClass('current');
       if(isClick){this.currIndex = i;}         
     },
-    search: function (what,rerun) {
-      var phrase = what || this.extract(document.referrer) || this.extract(document.location);
-      if (!phrase) {
-        if(!rerun){
-          this.showDialog();
-        }
-        jQ('._hiliteCont').hide();
-        jQ('#sitehiliteInfo').show().find('input:eq(0)').focus();;
-        return;
-      }else{
-        jQ('#sitehiliteInfo').hide();
-        jQ('._hiliteCont').show()
-            .find('li:not(._hiliteOptions)').remove();
-      }
+    log: function (beep) {
+      window.console && console.log(beep);
+    },    
+    getNeedles: function(phrase){
       var needles=
-          phrase.replace(/("|^\s+|\s+$)/g,"") //unquote,trim
-                .replace(this.config.stopwords,"")
-                .replace(/(['-.*+?^${}()|[\]\/\\])/g, "\\$1")//escape some
-                .replace(/[\s,]+/g, "|");//expand
-                
-      //filter-out anything shorter than 3 chars
-      needles = jQ.makeArray(jQ(needles.split('|')).filter(function () {
-                   return this.length >= self.config.minLength &&
-                           !/^\d+$/.test(this);
-                })).join("|");
-      if(needles.length<1||phrase.length<2){
-        return;
-      } 
+             phrase
+            .replace(/("|^\s+|\s+$)/g,"") //unquote,trim
+            .replace(this.config.stopwords,"")
+            .replace(/(['-.*+?^${}()|[\]\/\\])/g, "\\$1")//escape some
+            .replace(/[\s,]+/g, "|");//expand
+            
+      //filter-out digits and anything shorter than minLength chars
+      return jQ.makeArray(jQ(needles.split('|')).filter(function(){
+               return this.length >= self.config.minLength &&
+                 !/^\d+$/.test(this);
+            }));
+    
+    },    
+    search: function (needles) {    
       var sense=this.config.isCasesensitive ? 'g' : 'ig';
       var pre =this.config.beginsWith?'\\b':'';
-      var post=this.config.endWith?'\\b':'';
-      var regex = new RegExp([pre, '(' + needles + ')',post].join(""), sense);
+      var post=this.config.endsWith?'\\b':'';
+      var regex = new RegExp([pre, '(' + needles.join("|") + ')',post].join(""), sense);
+      //regex=/\b((lorem( ?ipsum( ?dolor( ?sap( ?safari)?)?)?)?)|(ipsum|dolor|sap|safari))/gi
       //var regex = new RegExp(['(<[^>]*>)|',pre..
-      //console.log(regex.toString(),'--',needles)
-
+      this.log(regex.toString(),'--',needles)
       //console.time('DOMWalkingTimer');
-      this.highlight(jQ('body'), regex, 'span', '_hiliteword');         
+      this.highlight(jQ(this.config.content), regex, 'span', '_hiliteword');         
       //console.timeEnd('DOMWalkingTimer');
       jQ('html,body').animate({scrollTop:0},0);
 
       if(this.count<1){
-        this.showDialog(true);
+        if(this.config.enableInput){
+          this.showDialog(true);
+        }  
         return;
       } 
       var o = [];
@@ -196,11 +192,11 @@ javascript: (function () {
 
         this.pos[i] = o||1;
         ratio = o/bh;
-        top = ratio * document.body.clientHeight;
+        top = ratio * screen.availHeight;//document.body.clientHeight;
         if (top < 80) top = 80+Math.random()*10;
         jQ('<a>')
           .css('top', top)
-          .attr('title', 'Go to match #'+i)
+          .attr('title', 'Go to corresponding match #'+(this.count-i+1))
           .click((function(n){
             return function(){self.slideTo(n, true);}
           })(i))
@@ -208,6 +204,9 @@ javascript: (function () {
         .appendTo("body");
       }
       this.attachKeys();
+      if(this.config.callback){
+        this.config.callback.call();
+      }
       jQ("._hiliteCont li._hiliteOptions label")
           .eq(3).hide().end()
           .find('input').bind('change', function(){
@@ -240,7 +239,7 @@ javascript: (function () {
       }
       document.getElementsByTagName("head")[0].appendChild(c);
     },
-    attachKeys: function () {
+    attachKeys: function(){
       if(!this.oldOnkey){
         this.oldOnkey = document.onkeydown;
       }  
@@ -249,7 +248,7 @@ javascript: (function () {
         if(typeof self.oldOnkey == 'function') {
           self.oldOnkey(e);
         }
-        if(!self.config.enableshortcuts){
+        if(!self.config.enableArrowKeys){
           return;
         }
         if(a.keyCode == 37) {//left arrow
@@ -258,6 +257,31 @@ javascript: (function () {
         else if(a.keyCode == 39) {//right arrow
           self.nextmatch();
         }
+      }
+    },
+    ready: function (phrase){
+      this.isbkmklet&&this.go(phrase)||
+      jQ(document).ready(function(){
+        self.go(phrase);
+      });
+    },
+    init: function (conf,phrase){
+      self = this;    
+      this.count=this.wcount=this.nodes=this.currIndex=0;      
+      this.config.stopwords=new RegExp('\\b('+this.config.stopwords+')\\b','ig');
+      for(i in conf){
+        this.config[i]=conf[i];
+      }
+      if(typeof jQuery == 'undefined'||jQuery.prototype.jquery<"1.2.6"){
+        this.require(
+          'http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js',
+          function(){
+           jQ = jQuery.noConflict();
+           self.ready(phrase);
+        });
+      } else {
+        jQ = jQuery;
+        this.ready(phrase);
       }
     },
     showDialog: function(reveal){
@@ -277,30 +301,37 @@ javascript: (function () {
                 " class='txt' type='text' size='23'>")
         .append(b).toggle(reveal);
     },
-    init: function () {    
-      self = this;
-      this.count=this.wcount=this.nodes=this.currIndex=0;      
-      this.config.stopwords=new RegExp('\\b('+this.config.stopwords+')\\b','ig');
-      if (typeof jQuery == 'undefined'||jQuery.prototype.jquery<"1.2.6") {
-        this.require(
-          'http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js',
-          function () {
-           jQ = jQuery.noConflict();
-           self.go();
-        });
-      } else {
-        jQ = jQuery;
-        this.go();
+    isbkmklet:true,
+    go: function (what){
+      var phrase = what || this.extract(document.referrer) || this.extract(document.location);
+      if (!phrase) {
+        if(this.config.enableInput){
+          if(!rerun){
+            this.showDialog();
+          }
+          jQ('#sitehiliteInfo').show().find('input:eq(0)').focus();
+          jQ('._hiliteCont').hide();
+        }else{
+          //this.dismiss();
+        }
+        return;
+      }else{
+        jQ('#sitehiliteInfo').hide();
+        jQ('._hiliteword').attr('class','');
+        jQ('._hiliteCont').show()
+            .find('li:not(._hiliteOptions)').remove();
       }
-    },
-    go: function (phrase){
+      var needles=this.getNeedles(phrase);
+      if(needles.length<1){
+        return;
+      } 
       if(jQ('body').hasClass('sitehiliteEnabled')){
-        return this.search(phrase,true);
+        return this.search(needles,true);
       }
       //<><![CDATA[..]]></>.toString();
       var css = "\
             body{position:relative;}\
-            body.hilitetop{margin-top:78px;}body.hilitebottom{margin-bottom:84px;}\
+            body.hilitetop{margin-top:90px;}body.hilitebottom{margin-bottom:84px;}\
             body.colorify.enableHilite .word1{background-color: #FFFF66 !important}\
             body.colorify.enableHilite .word3{background-color: #88cc00 !important}\
             body.colorify.enableHilite .word2{background-color: #FF99FF !important}\
@@ -314,7 +345,7 @@ javascript: (function () {
                 position:fixed;\
                 background-color:#333;\
                 width:100%;\
-                margin:0;\
+                margin:0;left:0;\
                 padding:0 0 5px;\
                 overflow:auto;\
                 line-height:1;\
@@ -364,6 +395,7 @@ javascript: (function () {
             ._hiliteCont li span{\
                 display:block;\
                 line-height:12px;\
+                text-align:left;\
             }\
             body ul._hiliteCont li._hiliteOptions label span{\
                 display:inline;color:#888888 !important;border:0 none !important;\
@@ -374,7 +406,7 @@ javascript: (function () {
                 margin:0 2px;\
                 background-color:#ddd;\
                 background-color:#555;\
-                font-size:12px;\
+                font-size:10px;\
                 cursor:pointer;\
                 color:#999;\
                 text-decoration:none;\
@@ -412,6 +444,7 @@ javascript: (function () {
                 text-align:left;\
                 top: 35%;\
                 left:0;\
+                overflow: auto;\
                 position: fixed;\
                 font-size:20px;\
             }\
@@ -467,19 +500,22 @@ javascript: (function () {
         .append(
           '<label><input type="checkbox" name="enableHilite" checked>Highlight ON|OFF</label>'+
           '<label title="Use the LEFT,RIGHT arrow keys to move back and forth">'+
-          '<input type="checkbox" name="enableshortcuts" checked>Use arrow keys</label>'+
+          '<input type="checkbox" name="enableArrowKeys" checked>Use arrow keys</label>'+
           '<label><input type="checkbox" name="colorify">Colors, please!</label>'+
           '<label ><input type="checkbox" name="sitehiliteContextualize" disabled>Show in context</label>'
         )
       .addClass('_hiliteOptions')
       .appendTo("._hiliteCont");
-      jQuery('script').remove();
+      jQ('script').remove();
+      jQ('._hiliteCont label input[name=colorify]').attr('checked', this.config.colorify);
       var klass='sitehiliteEnabled enableHilite '+
-                    (this.config.OptionsMenu.position=='top'?'hilitetop':'hilitebottom')+
-                    (this.config.OptionsMenu.show?' showHilitrMenu':'');
+                    (this.config.navMenu.position=='top'?'hilitetop':'hilitebottom')+
+                    (this.config.navMenu.show?' showHilitrMenu':'')+
+                    (this.config.colorify?' colorify':'');
       jQ('body').addClass(klass);
-      this.search(phrase);
+      this.search(needles);
     }
   }
 })();
 sitehilite.init();
+
