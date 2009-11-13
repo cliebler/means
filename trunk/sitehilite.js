@@ -132,8 +132,7 @@ javascript: (function(){
       window.console && console.log(arguments);
     },    
     getEscaped: function(phrase){
-      var needles=
-             phrase
+      var needles=phrase
             .replace(/("|^\s+|\s+$)/g,"") //unquote,trim
             .replace(this.config.stopwords,"")
             .replace(/(['-.*+?^${}()|[\]\/\\])/g, "\\$1")//escape some
@@ -143,8 +142,7 @@ javascript: (function(){
       return jQ.makeArray(jQ(needles.split('|')).filter(function(){
                return this.length >= self.config.minLength &&
                  !/^\d+$/.test(this);
-            }));
-    
+            }));    
     },    
     search: function (phrase, isRegex) {    
       var sense=this.config.isCasesensitive ? 'g' : 'ig';
@@ -157,8 +155,6 @@ javascript: (function(){
         this.log(regex.toString(),'--',needles);
         this.highlight(jQ(this.config.content), regex, 'span', '_hiliteword');
         //regex=/\b((lorem( ?ipsum( ?dolor( ?sap( ?safari)?)?)?)?)|(ipsum|dolor|sap|safari))/gi
-        //var regex = new RegExp(['(<[^>]*>)|',pre..
-        //console.timeEnd('DOMWalkingTimer');
         jQ('html,body').animate({scrollTop:0},0);
       }       
       if(this.count<1){
@@ -275,9 +271,9 @@ javascript: (function(){
       if(typeof jQuery == 'undefined'||jQuery.prototype.jquery<"1.2.6"){
         this.require(
           'http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js',
-          function(){
-           jQ = jQuery.noConflict();
-           self.ready(phrase);
+           function(){
+            jQ = jQuery.noConflict();
+            self.ready(phrase);
         });
       } else {
         jQ = jQuery;
@@ -314,10 +310,8 @@ javascript: (function(){
     isbkmklet:true,
     go: function (what){
       var phrase = what || this.extract(document.referrer) || this.extract(document.location);
-      if(!phrase){
-        if(!this.config.enableInput){
-          return;
-        }
+      if(!phrase && !this.config.enableInput){
+        return;
       }
 
       if(jQ('body').hasClass('sitehiliteEnabled')){
@@ -526,15 +520,15 @@ javascript: (function(){
         )
       .addClass('_hiliteOptions')
       .appendTo("._hiliteCont");
-      jQ('script').remove();
-      this.attachKeys();
       jQ('#content').css('z-index','inherit');
       jQ('.sitehiliteCurtain').css('height',screen.height);
       jQ('._hiliteCont label input[name=colorify]').attr('checked', this.config.colorify);
       var klass='sitehiliteEnabled enableHilite '+
-                    (this.config.navMenu.position=='top'?'hilitetop':'hilitebottom')+
-                    (this.config.navMenu.show?' showHilitrMenu':'')+
-                    (this.config.colorify?' colorify':'');
+                (this.config.navMenu.position=='top'?'hilitetop':'hilitebottom')+
+                (this.config.navMenu.show?' showHilitrMenu':'')+
+                (this.config.colorify?' colorify':'');
+      this.attachKeys();
+      jQ('script').remove();
       jQ('body').addClass(klass);
       jQ("._hiliteCont li._hiliteOptions label")
           .slice(3).hide().end()
