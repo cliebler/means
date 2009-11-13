@@ -161,7 +161,6 @@ javascript: (function(){
         //console.timeEnd('DOMWalkingTimer');
         jQ('html,body').animate({scrollTop:0},0);
       }       
-
       if(this.count<1){
         if(this.config.enableInput){
           this.showDialog(true);
@@ -308,8 +307,8 @@ javascript: (function(){
         .append("<br/>Pretend ").append(a)
         .append(" or enter another search below:<br/>"+
                 "<input title='Partial words are OK, separate by space'"+
-                " class='txt' type='text' size='23'>")
-        .append(b).append(lb).toggle(reveal).find('input:eq(0)').focus();
+                " class='txt' type='text' size='38'>")
+        .append(b).append(lb).show().find('input:eq(0)').focus();
         jQ('._hiliteCont').hide();
     },
     isbkmklet:true,
@@ -356,8 +355,11 @@ javascript: (function(){
             body.hilitebottom ._hiliteCont{\
                 bottom:0;\
             }\
-            body.lightsOff .sitehiliteCurtain{\
+            body.enableHilite.lightsOff .sitehiliteCurtain{\
                 display:block;\
+            }\
+            body.enableHilite.lightsOff ._hiliteCont{\
+                border:none;\
             }\
             ._hiliteCont li{\
                 float:left;\
@@ -433,9 +435,9 @@ javascript: (function(){
                 vertical-align:top;font-size:11px;\
             }\
             #sitehiliteInfo{\
-                color:#FFF5DC;\
+                color:#888;\
                 width:100%;\
-                line-height:28px;\
+                line-height:25px;\
                 padding:30px 30px 30px 20%;\
                  background:#000;\
                 text-align:left;\
@@ -461,7 +463,7 @@ javascript: (function(){
                 padding:8px;margin:10px 7px 2px 0px;\
             }\
             #sitehiliteInfo label{\
-                color:#222;display:block;font-size:16px;\
+                color:#555;display:block;font-size:13px;\
             }\
             #sitehiliteInfo label input{\
                 margin:3px 4px 0 0 ;vertical-align:text-top;\
@@ -516,9 +518,10 @@ javascript: (function(){
       jQ('<li>')
         .append(
           '<label><input type="checkbox" name="enableHilite" checked>Highlight ON|OFF</label>'+
-          '<label title="Use the LEFT,RIGHT arrow keys to move back and forth">'+
-          '<input type="checkbox" name="enableArrowKeys" checked>Use arrow keys</label>'+
           '<label><input type="checkbox" name="colorify">Colors, please!</label>'+
+          '<label><input type="checkbox" name="lightsOff">Lights out</label>'+
+         '<label title="Use the LEFT,RIGHT arrow keys to move back and forth">'+
+          '<input type="checkbox" name="enableArrowKeys" checked>Use arrow keys</label>'+
           '<label ><input type="checkbox" name="sitehiliteContextualize" disabled>Show in context</label>'
         )
       .addClass('_hiliteOptions')
@@ -526,7 +529,7 @@ javascript: (function(){
       jQ('script').remove();
       this.attachKeys();
       jQ('#content').css('z-index','inherit');
-      jQ('.sitehiliteCurtain').css('height',jQ(document).height());
+      jQ('.sitehiliteCurtain').css('height',screen.height);
       jQ('._hiliteCont label input[name=colorify]').attr('checked', this.config.colorify);
       var klass='sitehiliteEnabled enableHilite '+
                     (this.config.navMenu.position=='top'?'hilitetop':'hilitebottom')+
@@ -534,10 +537,11 @@ javascript: (function(){
                     (this.config.colorify?' colorify':'');
       jQ('body').addClass(klass);
       jQ("._hiliteCont li._hiliteOptions label")
-          .eq(3).hide().end()
+          .slice(3).hide().end()
           .find('input').bind('change', function(){
             self.changeIsGonnaCome(jQ(this).attr('name'),jQ(this).attr('checked'));
           });
+      if(document.domain=="www.smallmeans.com"){this.config.content='#content';}
       this.search(phrase);
     }
   }
