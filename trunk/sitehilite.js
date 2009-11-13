@@ -91,7 +91,8 @@ javascript: (function(){
     dismiss: function(){
       //tear down and head east..
       document.onkeydown=this.oldOnkey;      
-      jQ('._hiliteCont,#sitehiliteInfo,#sitehiliteCSS').remove();
+      jQ('._hiliteword').attr('class','');
+      jQ('._hiliteCont,.sitehiliteCurtain,#sitehiliteInfo,#sitehiliteCSS').remove();
       jQ('body').removeClass('sitehiliteEnabled enableHilite '+
                 'enableArrowKeys showHilitrMenu hilitetop colorify');
       
@@ -127,16 +128,16 @@ javascript: (function(){
          .filter('.hilite'+i).addClass('current');
       if(isClick){this.currIndex = i;}         
     },
-    log: function (beep) {
-      window.console && console.log(beep);
+    log: function () {
+      window.console && console.log(arguments);
     },    
-    getNeedles: function(phrase){
+    getEscaped: function(phrase){
       var needles=
              phrase
             .replace(/("|^\s+|\s+$)/g,"") //unquote,trim
             .replace(this.config.stopwords,"")
             .replace(/(['-.*+?^${}()|[\]\/\\])/g, "\\$1")//escape some
-            .replace(/[\s,]+/g, "|");//expand
+            .replace(/[\s,]+/g, "|");//expand by space and comma
             
       //filter-out digits and anything shorter than minLength chars
       return jQ.makeArray(jQ(needles.split('|')).filter(function(){
@@ -145,15 +146,15 @@ javascript: (function(){
             }));
     
     },    
-    search: function (phrase) {    
+    search: function (phrase, isRegex) {    
       var sense=this.config.isCasesensitive ? 'g' : 'ig';
       var pre =this.config.beginsWith?'\\b':'';
       var post=this.config.endsWith?'\\b':'';
 
       if(phrase){
-        var needles=this.getNeedles(phrase);
-        var regex = new RegExp([pre, '(' + needles.join("|") + ')',post].join(""), sense);
-        this.log(regex.toString(),'--',needles)      
+        var needles=isRegex && phrase || [pre, '(' + this.getEscaped(phrase).join("|") + ')',post].join("");
+        var regex = new RegExp(needles,sense);
+        this.log(regex.toString(),'--',needles);
         this.highlight(jQ(this.config.content), regex, 'span', '_hiliteword');
         //regex=/\b((lorem( ?ipsum( ?dolor( ?sap( ?safari)?)?)?)?)|(ipsum|dolor|sap|safari))/gi
         //var regex = new RegExp(['(<[^>]*>)|',pre..
@@ -206,12 +207,6 @@ javascript: (function(){
           .addClass('scrollbarMark word'+this.stats['w'][i])
         .appendTo("body");
       }
-      jQ("._hiliteCont li._hiliteOptions label")
-          .eq(3).hide().end()
-          .find('input').bind('change', function(){
-            self.changeIsGonnaCome(jQ(this).attr('name'),jQ(this).attr('checked'));
-          });
-      this.attachKeys();
       this.currIndex=this.count+1;
       if(this.config.callback){
         try{
@@ -291,34 +286,43 @@ javascript: (function(){
       }
     },
     showDialog: function(reveal){
+      var c=jQ('#sitehiliteInfo');
+      if(jQ('input',c).size()){
+        jQ(c).toggle(reveal);
+        return;
+      }
       var a=jQ('<a>nothing happened</a>')
             .click(function(){self.dismiss();});
       var b=jQ("<input type='button' value='Go!'>")
               .bind('click',function(){
-                 self.search(jQ(this).prev().val(),true);
+                 jQ('._hiliteCont').show()
+                     .find('li:not(._hiliteOptions)').remove();
                  jQ('#sitehiliteInfo').hide();
-                 jQ('._hiliteCont').show();
+                 jQ('._hiliteword').attr('class','');
+                 var isRegex=jQ(this).next().find('input').attr('checked');
+                 self.search(jQ(this).prev().val(),isRegex);
              });
-      jQ('#sitehiliteInfo')
+      var lb=jQ('<label><input type="checkbox">Treat as regex</label>');
+      jQ(c)
         .append("Oops... Couldn't find the word you were looking for..")
         .append("<br/>Pretend ").append(a)
         .append(" or enter another search below:<br/>"+
                 "<input title='Partial words are OK, separate by space'"+
                 " class='txt' type='text' size='23'>")
-        .append(b).toggle(reveal);
+        .append(b).append(lb).toggle(reveal).find('input:eq(0)').focus();
         jQ('._hiliteCont').hide();
     },
     isbkmklet:true,
     go: function (what){
       var phrase = what || this.extract(document.referrer) || this.extract(document.location);
-      if(phrase){
-        jQ('#sitehiliteInfo').hide();
-        jQ('._hiliteword').attr('class','');
-        jQ('._hiliteCont').show()
-            .find('li:not(._hiliteOptions)').remove();
+      if(!phrase){
+        if(!this.config.enableInput){
+          return;
+        }
       }
+
       if(jQ('body').hasClass('sitehiliteEnabled')){
-        return this.search(phrase,true);
+        return this.search(phrase);
       }
       //<><![CDATA[..]]></>.toString();
       var css = "\
@@ -352,7 +356,8 @@ javascript: (function(){
             body.hilitebottom ._hiliteCont{\
                 bottom:0;\
             }\
-            body.enableHilite ._hiliteCont{\
+            body.lightsOff .sitehiliteCurtain{\
+                display:block;\
             }\
             ._hiliteCont li{\
                 float:left;\
@@ -398,7 +403,7 @@ javascript: (function(){
                 margin:0 2px;\
                 background-color:#ddd;\
                 background-color:#555;\
-                font-size:10px;\
+                font-size:11px;\
                 cursor:pointer;\
                 color:#999;\
                 text-decoration:none;\
@@ -455,7 +460,13 @@ javascript: (function(){
             #sitehiliteInfo input.txt{\
                 padding:8px;margin:10px 7px 2px 0px;\
             }\
-              #sitehiliteInfo,._hiliteCont,.scrollbarMark{\
+            #sitehiliteInfo label{\
+                color:#222;display:block;font-size:16px;\
+            }\
+            #sitehiliteInfo label input{\
+                margin:3px 4px 0 0 ;vertical-align:text-top;\
+            }\
+            #sitehiliteInfo,._hiliteCont,.scrollbarMark{\
                 z-index:999999;\
             }\
             body.enableHilite ._hiliteword{\
@@ -465,12 +476,17 @@ javascript: (function(){
                 border:1px solid #aaa !important;\
                 display:inline !important;\
                 font-size:100%;\
+                z-index:999998;\
+                position:relative;\
             }\
             body.enableHilite ._hiliteword.current{\
+                -moz-box-shadow:2px 2px 11px 3px #000;\
                 border-color:red !important;\
                 font-weight:bold;\
                 font-size:125%;\
-                xcolor:red;\
+            }\
+            body.enableHilite.lightsOff ._hiliteword{\
+                border:none !important;\
             }\
             body.enableHilite ._hiliteword.current:before{\
                 _content: '|';\
@@ -486,9 +502,17 @@ javascript: (function(){
             .scrollbarMark,._hiliteCont,._hiliteCont li,#sitehiliteInfo{\
                 display:none;\
             }\
+            .sitehiliteCurtain{\
+                position:fixed;\
+                left:0;top:0;\
+                opacity:0.6;\
+                z-index:999998;\
+                width:100%;display:none;\
+                background-color:#000;\
+            }\
         ";
       jQ('<style id="sitehiliteCSS" type="text/css"></style>').text(css).appendTo("head");
-      jQ('<ul class="_hiliteCont"></ul><div id="sitehiliteInfo"></div>').prependTo("body");
+      jQ('<ul class="_hiliteCont"></ul><div id="sitehiliteInfo"></div><div class="sitehiliteCurtain"></div>').prependTo("body");
       jQ('<li>')
         .append(
           '<label><input type="checkbox" name="enableHilite" checked>Highlight ON|OFF</label>'+
@@ -500,12 +524,20 @@ javascript: (function(){
       .addClass('_hiliteOptions')
       .appendTo("._hiliteCont");
       jQ('script').remove();
+      this.attachKeys();
+      jQ('#content').css('z-index','inherit');
+      jQ('.sitehiliteCurtain').css('height',jQ(document).height());
       jQ('._hiliteCont label input[name=colorify]').attr('checked', this.config.colorify);
       var klass='sitehiliteEnabled enableHilite '+
                     (this.config.navMenu.position=='top'?'hilitetop':'hilitebottom')+
                     (this.config.navMenu.show?' showHilitrMenu':'')+
                     (this.config.colorify?' colorify':'');
       jQ('body').addClass(klass);
+      jQ("._hiliteCont li._hiliteOptions label")
+          .eq(3).hide().end()
+          .find('input').bind('change', function(){
+            self.changeIsGonnaCome(jQ(this).attr('name'),jQ(this).attr('checked'));
+          });
       this.search(phrase);
     }
   }
