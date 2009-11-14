@@ -80,12 +80,12 @@ javascript: (function(){
     },
     highlight: function (context, needleRegex, tag, klass){
       return context.each(function() {
-        self.wrapWordsInDescendants(this, needleRegex, tag, klass);
+        _self.wrapWordsInDescendants(this, needleRegex, tag, klass);
       });
     },
     highlight_old_and_busted: function (context, regex, klass) {
       return jQ(context).html(jQ(context).html().replace(regex, function (a, b, c) {
-        return (a.charAt(0) == '<') ? a : self.wrap(klass, c);
+        return (a.charAt(0) == '<') ? a : _self.wrap(klass, c);
       }));
     },
     dismiss: function(){
@@ -102,7 +102,7 @@ javascript: (function(){
       if (where.indexOf('?') == -1) return;
       var q = where.substr(where.indexOf('?') + 1);
       q.replace(/([^=&]+)=([^&]*)/g, function (m, k, v) {
-        if (self.config.terms.test(k)) {
+        if (_self.config.terms.test(k)) {
           if (/^cache/.test(v)) {
             v = v.substr(v.indexOf('+') + 1)
           }
@@ -140,7 +140,7 @@ javascript: (function(){
             
       //filter-out digits and anything shorter than minLength chars
       return jQ.makeArray(jQ(needles.split('|')).filter(function(){
-               return this.length >= self.config.minLength &&
+               return this.length >= _self.config.minLength &&
                  !/^\d+$/.test(this);
             }));    
     },    
@@ -165,18 +165,18 @@ javascript: (function(){
       } 
       var o = [];
       jQ.each(this.stats.f, function (k, v) {
-        self.stats['p'][k].reverse();
+        _self.stats['p'][k].reverse();
         var i=0, sp="", d = [];
         sp = jQ('<span>');
         while (i++ < v) {
           if (i > 10) break;
           jQ('<a>').text(i).click((function (n) {
-            return function(){self.slideTo(n, true);}
-          })(self.stats['p'][k][i-1])).appendTo(jQ(sp));
+            return function(){_self.slideTo(n, true);}
+          })(_self.stats['p'][k][i-1])).appendTo(jQ(sp));
         }
         jQ('<li>')
           .append(jQ('<small>' + k + '<em>(' + v + ')</em></small>')
-          .addClass('word' + self.stats['c'][k]))
+          .addClass('word' + _self.stats['c'][k]))
           .append(sp)
         .appendTo('._hiliteCont')
       });
@@ -197,7 +197,7 @@ javascript: (function(){
           .css('top', top)
           .attr('title', 'Go to corresponding match #'+(this.count-i+1))
           .click((function(n){
-            return function(){self.slideTo(n, true);}
+            return function(){_self.slideTo(n, true);}
           })(i))
           .addClass('scrollbarMark word'+this.stats['w'][i])
         .appendTo("body");
@@ -241,28 +241,29 @@ javascript: (function(){
       }  
       document.onkeydown = function (e) {
         var a = e || window.event;
-        if(typeof self.oldOnkey == 'function') {
-          self.oldOnkey(e);
+        if(typeof _self.oldOnkey == 'function') {
+          _self.oldOnkey(e);
         }
-        if(!self.config.enableArrowKeys){
+        if(!_self.config.enableArrowKeys){
           return;
         }
+
         if(a.keyCode == 37) {//left arrow
-          self.prevmatch();
+          _self.prevmatch();
         }
-        else if(a.keyCode == 39) {//right arrow
-          self.nextmatch();
+        else if(a.keyCode == 39 || a.keyCode==114) {//right arrow,F3
+          _self.nextmatch();
         }
       }
     },
     ready: function (phrase){
       this.isbkmklet&&this.go(phrase)||
       jQ(document).ready(function(){
-        self.go(phrase);
+        _self.go(phrase);
       });
     },
-    init: function (conf,phrase){
-      self = this;    
+    init:function(conf,phrase){
+      _self = this;    
       this.count=this.wcount=this.nodes=0;
       this.config.stopwords=new RegExp('\\b('+this.config.stopwords+')\\b','ig');
       for(i in conf){
@@ -273,7 +274,7 @@ javascript: (function(){
           'http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js',
            function(){
             jQ = jQuery.noConflict();
-            self.ready(phrase);
+            _self.ready(phrase);
         });
       } else {
         jQ = jQuery;
@@ -287,7 +288,7 @@ javascript: (function(){
         return;
       }
       var a=jQ('<a>nothing happened</a>')
-            .click(function(){self.dismiss();});
+            .click(function(){_self.dismiss();});
       var b=jQ("<input type='button' value='Go!'>")
               .bind('click',function(){
                  jQ('._hiliteCont').show()
@@ -295,9 +296,9 @@ javascript: (function(){
                  jQ('#sitehiliteInfo').hide();
                  jQ('._hiliteword').attr('class','');
                  var isRegex=jQ(this).next().find('input').attr('checked');
-                 self.search(jQ(this).prev().val(),isRegex);
+                 _self.search(jQ(this).prev().val(),isRegex);
              });
-      var lb=jQ('<label><input type="checkbox">Treat as regex</label>');
+      var lb=jQ('<label><input type="checkbox">Treat as regular expression</label>');
       jQ(c)
         .append("Oops... Couldn't find the word you were looking for..")
         .append("<br/>Pretend ").append(a)
@@ -533,7 +534,7 @@ javascript: (function(){
       jQ("._hiliteCont li._hiliteOptions label")
           .slice(3).hide().end()
           .find('input').bind('change', function(){
-            self.changeIsGonnaCome(jQ(this).attr('name'),jQ(this).attr('checked'));
+            _self.changeIsGonnaCome(jQ(this).attr('name'),jQ(this).attr('checked'));
           });
       if(document.domain=="www.smallmeans.com"){this.config.content='#content';}
       this.search(phrase);
