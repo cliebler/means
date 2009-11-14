@@ -318,9 +318,197 @@ javascript: (function(){
       if(jQ('body').hasClass('sitehiliteEnabled')){
         return this.search(phrase);
       }
-
-
-      jQ('<link rel="stylesheet" href="http://means.googlecode.com/svn/trunk/sitehilite.css" id="sitehiliteCSS">').appendTo("head");
+      //<><![CDATA[..]]></>.toString();
+      var css = "\
+            body{position:relative;}\
+            body.hilitetop{margin-top:90px;}body.hilitebottom{margin-bottom:84px;}\
+            body.colorify.enableHilite .word1{background-color: #FFFF66 !important}\
+            body.colorify.enableHilite .word3{background-color: #88cc00 !important}\
+            body.colorify.enableHilite .word2{background-color: #FF99FF !important}\
+            body.colorify.enableHilite .word4{background-color: #A0FFFF !important}\
+            body.colorify.enableHilite .word5{background-color: #ff6666 !important}\
+            body.colorify.enableHilite .word6{background-color: #3333ff !important}\
+            body.colorify.enableHilite .word7{background-color: #964B00 !important}\
+            body.colorify.enableHilite .word8{background-color: #00FF00 !important;}\
+            body.colorify.enableHilite .word8,body.colorify.enableHilite .word6{color:#000 !important}\
+            ._hiliteCont{\
+                position:fixed;\
+                background-color:#333;\
+                width:100%;\
+                margin:0;left:0;\
+                padding:0 0 5px;\
+                overflow:auto;\
+                line-height:1;\
+                border-bottom:10px solid #DAD0C7;\
+            }\
+            body.showHilitrMenu ._hiliteCont{\
+                display:block;\
+            }\
+            body.hilitetop ._hiliteCont{\
+                top:0;\
+            }\
+            body.hilitebottom ._hiliteCont{\
+                bottom:0;\
+            }\
+            body.enableHilite.lightsOff .sitehiliteCurtain{\
+                display:block;\
+            }\
+            body.enableHilite.lightsOff ._hiliteCont{\
+                border:none;\
+            }\
+            ._hiliteCont li{\
+                float:left;\
+                padding:6px 3px;\
+                margin:2px;\
+                background:#444 !important;\
+                xline-height:1.4em;\
+                overflow:hidden;\
+                text-transform:capitalize;\
+            }\
+            body.enableHilite ._hiliteCont li,\
+            body.enableHilite .scrollbarMark{\
+                color:#99f;display:block;\
+            }\
+            body.colorify ._hiliteCont li{\
+                color:#666;\
+            }\
+            ._hiliteCont li._hiliteOptions{\
+                float:right;display:block;\
+                font-size:12px;\
+                margin:3px 5px;\
+                padding:1px 3px 6px;\
+            }\
+            ._hiliteCont li._hiliteOptions input{\
+                vertical-align:sub;\
+                margin:5px 3px 5px 5px;\
+                padding:0;\
+            }\
+            ._hiliteCont li._hiliteOptions input{\
+                display:inline !important;background:transparent !important;\
+            }\
+            ._hiliteCont li span{\
+                display:block;\
+                line-height:12px;\
+                text-align:left;\
+            }\
+            body ul._hiliteCont li._hiliteOptions label span{\
+                display:inline;color:#888888 !important;border:0 none !important;\
+                background:transparent !important;padding:0 !important;\
+            }\
+            ._hiliteCont li span a{\
+                padding:1px 3px;\
+                margin:0 2px;\
+                background-color:#ddd;\
+                background-color:#555;\
+                font-size:11px;\
+                cursor:pointer;\
+                color:#999;\
+                text-decoration:none;\
+                text-shadow:1px 1px 1px #000;\
+            }\
+            ._hiliteCont li span a:hover{\
+                text-shadow:none;\
+                color:#fff;\
+            }\
+            ._hiliteCont li label{\
+                display:block;color:#999;\
+                text-align:left;\
+                text-transform:none;\
+                white-space:nowrap;\
+                float:none;width:auto;\
+                margin:0;padding:0;height:17px;\
+            }\
+            ._hiliteCont li small{\
+                padding:3px 6px;\
+                display:block;\
+                margin-bottom:5px;\
+                background-color:x#ffff99;font-size:24px;\
+            }\
+            ._hiliteCont li small em{\
+                margin-left:8px;background:transparent;\
+                font-weight:normal;padding:0;\
+                vertical-align:top;font-size:11px;\
+            }\
+            #sitehiliteInfo{\
+                color:#888;\
+                width:100%;\
+                line-height:25px;\
+                padding:30px 30px 30px 20%;\
+                 background:#000;\
+                text-align:left;\
+                top: 35%;\
+                left:0;\
+                overflow: auto;\
+                position: fixed;\
+                font-size:20px;\
+            }\
+            #sitehiliteInfo a{\
+                color:#CC0000;cursor:pointer;\
+            }\
+            #sitehiliteInfo a,#sitehiliteInfo a:hover{\
+                font-size:100%;\
+            }\
+            #sitehiliteInfo input{\
+                padding:7px;\
+                height:auto;\
+                width:auto;\
+                display:inline;\
+            }\
+            #sitehiliteInfo input.txt{\
+                padding:8px;margin:10px 7px 2px 0px;\
+            }\
+            #sitehiliteInfo label{\
+                color:#555;display:block;font-size:13px;\
+            }\
+            #sitehiliteInfo label input{\
+                margin:3px 4px 0 0 ;vertical-align:text-top;\
+            }\
+            #sitehiliteInfo,._hiliteCont,.scrollbarMark{\
+                z-index:999999;\
+            }\
+            body.enableHilite ._hiliteword{\
+                background:#ff0 !important;\
+                padding:2px 0px 2px 5px !important;\
+                -moz-border-radius:2px;color:#000;\
+                border:1px solid #aaa !important;\
+                display:inline !important;\
+                font-size:100%;\
+                z-index:999998;\
+                position:relative;\
+            }\
+            body.enableHilite ._hiliteword.current{\
+                -moz-box-shadow:2px 2px 11px 3px #000;\
+                border-color:red !important;\
+                font-weight:bold;\
+                font-size:125%;\
+            }\
+            body.enableHilite.lightsOff ._hiliteword{\
+                border:none !important;\
+            }\
+            body.enableHilite ._hiliteword.current:before{\
+                _content: '|';\
+            }\
+            .scrollbarMark{\
+                position:fixed;\
+                right:3px;overflow:auto;\
+                border-bottom:1px solid #CC0033;\
+                padding:3px 6px;\
+                background-color:gold;\
+                cursor:pointer;\
+            }\
+            .scrollbarMark,._hiliteCont,._hiliteCont li,#sitehiliteInfo{\
+                display:none;\
+            }\
+            .sitehiliteCurtain{\
+                position:fixed;\
+                left:0;top:0;\
+                opacity:0.6;\
+                z-index:999998;\
+                width:100%;display:none;\
+                background-color:#000;\
+            }\
+        ";
+      jQ('<style id="sitehiliteCSS" type="text/css"></style>').text(css).appendTo("head");
       jQ('<ul class="_hiliteCont"></ul><div id="sitehiliteInfo"></div><div class="sitehiliteCurtain"></div>').prependTo("body");
       jQ('<li>')
         .append(

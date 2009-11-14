@@ -18,6 +18,9 @@ body.hilitetop ._hiliteCont{
 body.hilitebottom ._hiliteCont{
     bottom:0;
 }
+._hiliteCont,._hiliteCont li,.scrollbarMark{
+    display:none;
+}
 body.enableHilite.lightsOff .sitehiliteCurtain{
     display:block;
 }
@@ -163,9 +166,6 @@ body.enableHilite ._hiliteword.current:before{
     padding:3px 6px;
     background-color:gold;
     cursor:pointer;
-}
-.scrollbarMark,._hiliteCont,._hiliteCont li,#sitehiliteInfo{
-    display:none;
 }
 .sitehiliteCurtain{
     position:fixed;
