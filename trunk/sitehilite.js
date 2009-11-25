@@ -1,6 +1,6 @@
 /***********************************************
  sitehilite v. 0.1 --- Highlight search keywords
- -- Optimised for bookmarklet use..
+ -- self-contained bookmarklet version..
  http://www.smallmeans.com/tools/sitehilite
 
  Copyright (c) 2009 smallmeans.com
@@ -25,7 +25,7 @@ javascript: (function(){
       terms:/^(q|p|query|keywords?|search|search_?terms?|sog|soeg|find|s)$/i,      
       //english stop words with length>2
       stopwords: "about|and|are|com|xyou|for|from|how|that|then|the"+
-                 "this|was|what|when|where|who|will|with|und|the|www|define:",
+                 "this|was|what|when|where|who|will|with|und|the|www|define:"
     },
     pos :[],    
     stats:{
@@ -186,15 +186,15 @@ javascript: (function(){
       while (i-->1) {
         var s=0;
         try{
-          o = jQ('.hilite'+i).position().top;
+          o = jQ('.hilite'+i).offset().top;
         }catch(aarrrgh){o=0}
 
         this.pos[i] = o||1;
         ratio = o/bh;
-        top = ratio * screen.availHeight;//document.body.clientHeight;
-        if (top < 80) top = 80+Math.random()*10;
+        _top = ratio * screen.availHeight;//document.body.clientHeight;
+        if (_top < 80) _top = 80+Math.random()*10;
         jQ('<a>')
-          .css('top', top)
+          .css('top', _top)
           .attr('title', 'Go to corresponding match #'+(this.count-i+1))
           .click((function(n){
             return function(){_self.slideTo(n, true);}
@@ -211,7 +211,10 @@ javascript: (function(){
     },
     changeIsGonnaCome:function(change, hasCome){
       this.config[change]=hasCome;
-      if(change=="enableHilite"){
+      if(change=="lightsOff"){
+        //return jQ('.sitehiliteCurtain').fadeTo("slow", hasCome? 0.6: 0,function(){jQ('body').toggleClass(change);})
+      }
+      else if(change=="enableHilite"){
         var c="._hiliteCont";
         if(hasCome){
           jQ(c).css('height','auto');
@@ -300,12 +303,12 @@ javascript: (function(){
              });
       var lb=jQ('<label><input type="checkbox">Treat as regular expression</label>');
       jQ(c)
-        .append("Oops... Couldn't find the word you were looking for..")
-        .append("<br/>Pretend ").append(a)
-        .append(" or enter another search below:<br/>"+
+        /*.append("Oops... Couldn't find the word you were looking for..<br/>")*/
+        .append("Pretend ").append(a)
+        .append(" or enter your search below:<br/>"+
                 "<input title='Partial words are OK, separate by space'"+
                 " class='txt' type='text' size='38'>")
-        .append(b).append(lb).show().find('input:eq(0)').focus();
+        .append(b).append(lb).show().find('input:eq(0)').focus().val(this.demo||'');
         jQ('._hiliteCont').hide();
     },
     isbkmklet:true,
@@ -483,7 +486,7 @@ javascript: (function(){
                 font-size:125%;\
             }\
             body.enableHilite.lightsOff ._hiliteword{\
-                border:none !important;\
+                border-color:transparent !important;\
             }\
             body.enableHilite ._hiliteword.current:before{\
                 _content: '|';\
@@ -536,7 +539,7 @@ javascript: (function(){
           .find('input').bind('change', function(){
             _self.changeIsGonnaCome(jQ(this).attr('name'),jQ(this).attr('checked'));
           });
-      if(document.domain=="www.smallmeans.com"){this.config.content='#content';}
+      if(document.domain=="www.smallmeans.com"){this.config.content='#content';this.demo='A bookmarklet is a browser tool'}
       this.search(phrase);
     }
   }
