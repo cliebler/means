@@ -1,0 +1,141 @@
+#watch-main-area{
+  border:none;
+}
+#watch-rating-div, #footer,
+#watch-rating-div #ratingWrapper{
+  width:auto;
+}
+#masthead,#masthead-utility,#masthead-nav-main,#player-open-popup,
+#masthead-nav-user, #masthead-utility{
+  xdisplay:none;
+}
+#masthead-container{
+  margin:0 0 2em;
+}
+#masthead-container a.headcoll{
+  margin:7px 7px 7px 25px;
+}
+#masthead-search{
+  margin-right:4.5em;
+}
+#baseDiv,#masthead-container, #masthead{
+  width:95%;
+}
+#watch-this-vid-info{
+  width:84%;
+  margin-bottom:30px;
+}
+.watch-wide-mode #watch-this-vid-info{
+  width:70%;
+}
+.watch-wide-mode #watch-other-vids {
+  float:right;
+  margin:50px 0;
+}
+.watch-wide-mode #watch-vid-title.longform{
+  width:84%;
+}
+#watch-other-vids{
+  float:left;
+  margin-left:15px;
+}
+#promos,#footer .search,#masthead,
+#footer .region-and-language-pickers,
+#watch-this-vid-info .yt-uix-expander, 
+#newContent .video-entry .video-username,
+#watch-channel-discoverbox,
+#newContent.user #watch-related-discoverbox,
+#watch-related-discoverbox,
+#watch-comment-panel, #watch-actions-area,
+#watch-stats-data-wrapper{
+  display:none;
+}
+#watch-related-discoverbox,#watch-channel-discoverbox{
+  height:auto !important;
+  border:1px solid #ddd;
+  border-width:0 1px 1px;
+  padding-top:15px;
+}
+#newContent.related #watch-related-discoverbox,
+#newContent.comments #watch-comment-panel,
+#newContent.user #watch-channel-discoverbox{
+  display:block;
+}
+#newContent .video-entry{
+  float:left;
+  margin:4px 5px;
+  padding:5px 6px;
+  width:129px;
+  height:145px;
+}
+#newContent .video-entry .video-time{
+   
+}
+#newContent .video-entry a{
+}
+#newContent .video-entry a img{
+  border:1px solid #4d4c4c;
+}
+#newContent .video-entry .video-thumb-90,
+#newContent .video-entry img.vimg90{
+  width:auto;
+  height:auto;
+}
+.video-main-content{
+  padding-top:3px;
+}
+.video-mini-title{
+  max-height:inherit;
+  
+}
+.video-view-count{
+  color:#777;
+}
+.tabs{
+    border-bottom:1px solid #ddd;
+    xwidth:93%;
+}
+.tabs a.active{
+  background-color:#eee;
+  background-color:#fff;
+  color:#888888;
+}
+.tabs>a{
+  text-decoration:none;
+  background-color:#eee;
+  font-size:16px;
+  font-weight:bold;
+  line-height:34px;
+  margin:0 0 2px;
+  padding:8px 4px;
+  border:1px solid #ccc;
+  border-width:1px 0 0 1px;
+}
+.tabs > a:last-child{
+  text-decoration:line-through;
+}
+.tabs span{
+  float:right;
+  text-indent:3px;
+}
+#newContent.comments .tabs span{
+  display:none;
+}
+.tabs span a{
+  background-color:#EEEEEE;
+  margin:0 2px;
+  padding:1px 4px;
+}
+
+#newContent.comments .expander-small{
+  border:none;
+}
+
+.headcoll,#pointLink{
+  background:url(http://s.ytimg.com/yt/img/master-vfl125983.png) -36px -754px no-repeat;
+  padding:1px 22px 1px 1px;
+}
+.headcoll{
+  background-position:-61px -756px;
+  padding:0 15px 2px 0;
+}
