@@ -443,7 +443,7 @@ javascript: (function(){
                 left:0;\
                 overflow: auto;\
                 position: fixed;\
-                font-size:20px;\
+                font-size:15px;\
             }\
             #sitehiliteInfo a{\
                 color:#CC0000;cursor:pointer;\
