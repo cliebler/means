@@ -153,12 +153,11 @@ var youtube={
     this.getVideoComments(id);
     if(!this.config.sticky){
       this.getRelatedVideos(id);
+      if(user){
+        this.getUserChannel(user);
+      }
     }else{
       $('#_loadingInfo').addClass('related');
-    }
-    if(user && !this.config.sticky){
-      this.getUserChannel(user);
-    }else{
       $('#_loadingInfo').addClass('user');
     }
     var targetOffset = $('#baseDiv').offset().top;
@@ -192,8 +191,9 @@ var youtube={
     });
   },
   addHistory:function(obj){
-    $('<a href="/watch?v='+obj.i+'" title="'+obj.t+'">')
+    $('<a href="/watch?v='+obj.i+'">')
        .data('stuff',obj)
+       .attr('title',obj.t).attr('target','_blank')
        .append('<img src="'+obj.th+'"/></a>')
     .prependTo('.historyContainer div'); 
   },
@@ -205,9 +205,13 @@ var youtube={
     this.require("http://gdata.youtube.com/feeds/api/videos/"+id+
                  "?alt=json&callback=youtube.setVideoData");
   },
+  getFavoritedVideos:function(username){
+    this.require("http://gdata.youtube.com/feeds/api/users/"+username+"/favorites?"+
+                 "max-results=20&alt=json&callback=youtube.listFavdVideos");
+  },
   getRelatedVideos:function(id){
     this.require("http://gdata.youtube.com/feeds/videos/"+id+"/related?"+
-                 "max-results=20&alt=json&callback=youtube.listRelatedVideos");
+                 "max-results=40&alt=json&callback=youtube.listRelatedVideos");
   },
   searchVideos:function(term){
     this.require("http://gdata.youtube.com/feeds/api/videos?max-results=40&start-index=1&"+
@@ -290,7 +294,6 @@ var youtube={
     if(window.focus){w.focus()}
   },
   getDownloadURL:function (vId, t, format) {
-    //http://www.youtubemp4.com/video/${vId}.mp4
     return  "/get_video?video_id=" + vId + "&t=" + t + ((format == "") ? "" : "&fmt=" + format);
   },
   getVideoToken:function (format,callback) {
@@ -337,7 +340,8 @@ var youtube={
   initplayer:function(currentVideoID) {
     this.current=currentVideoID;
     var p='<object height="100%" width="100%" type="application/x-shockwave-flash"'+
-          'id="movie_player" data="/v/'+currentVideoID+'?enablejsapi=1">'+
+          'id="movie_player" data="/v/'+currentVideoID+'?enablejsapi=1&fs=1&showinfo=0">'+
+          '<param name="allowfullscreen" value="true"/>'+
           '<param name="allowScriptAccess" value="always"/>'+//mucho importante!
           '<param name="wmode" value="opaque"/></object>';
     $('#watch-player-div').html(p);
@@ -397,8 +401,6 @@ var youtube={
   }
 }
 //callback when player is ready
-// the native one works fine in Firefox but 
-// is never called in Safari or Chrome... arrgh!
 onYouTubePlayerReady=function(playerId) {
   player=jQuery("#movie_player").get(0);
   player.addEventListener("onError", "youtube.onPlayerError"); 
@@ -406,6 +408,9 @@ onYouTubePlayerReady=function(playerId) {
   setInterval(function(){self.updatePlayerInfo()}, 500);
   youtube.playVideo(youtube.current);
 }
+
+//-------- all that was just the cake, let's put the icing on --------
+
 
 youtube.require(
   'http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js',
@@ -415,6 +420,9 @@ youtube.require(
       $.fn.extend({
         hasFocus: function (a) {
             return elem.hasFocus
+        },
+        reverse: function(){
+          return this.pushStack(this.get().reverse(), arguments)
         },
         getVideoID: function(){
           return $(this).is('a') &&
@@ -428,9 +436,6 @@ youtube.require(
           }else{
             $(this).siblings().removeClass('active').end().addClass(c);
           }
-        },
-        reverse: function(){
-          return this.pushStack(this.get().reverse(), arguments)
         }
       });
       youtube.clickIt($('#watch-channel-videos-panel h2')[0]);
