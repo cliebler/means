@@ -235,7 +235,7 @@
 #watch-result-discoverbox ._loadingInfo{
   display:none
 }
-.headcoll,#pointLink,.historyContainer > a{
+.headcoll,#deepLink,.historyContainer > a{
   background:url(http://s.ytimg.com/yt/img/master-vfl125983.png) -36px -754px no-repeat;
   padding:1px 22px 1px 1px;
 }
@@ -364,6 +364,14 @@
   padding: 5px 7px 8px 8px;
   background-color:#eee;
 }
+.ytSettings{
+  padding:3px 0;
+  background-color:#eee;
+}
+.ytSettings label input{
+  position:relative;
+  top:2px;
+}
 p.info{
   background-color:#eee;
   padding:3px 2px;margin-bottom:9px;
@@ -372,7 +380,7 @@ p.info{
   float:right;
   margin-top:-33px;
 }
-.yhistory:hover{
+.yhistory:hover,.headcoll{
   text-decoration:none;
 }
 .yhistory span{

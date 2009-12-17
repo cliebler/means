@@ -340,7 +340,7 @@ var youtube={
   initplayer:function(currentVideoID) {
     this.current=currentVideoID;
     var p='<object height="100%" width="100%" type="application/x-shockwave-flash"'+
-          'id="movie_player" data="/v/'+currentVideoID+'?enablejsapi=1&fs=1&showinfo=0">'+
+          'id="movie_player" data="/v/'+currentVideoID+'?enablejsapi=1&fs=1&showsearch=0&showinfo=0">'+
           '<param name="allowfullscreen" value="true"/>'+
           '<param name="allowScriptAccess" value="always"/>'+//mucho importante!
           '<param name="wmode" value="opaque"/></object>';
@@ -378,7 +378,7 @@ var youtube={
   updatePlayerInfo:function(){
     $('#loadvidsize').text(this.getBytesLoaded());
     $('#vidsize').text(this.getSize());
-    $('#pointLink').attr('href','/watch?v='+this.current+'#t='+this.getCurrentTime());
+    $('#deepLink').attr('href','/watch?v='+this.current+'#t='+this.getCurrentTime());
   },
   onPlayerStateChange:function(state){
     if(!awaiting) return;
@@ -471,7 +471,7 @@ youtube.require(
 
       $('#watch-channel-vids-div').after(
 		"<div> Video: <b id='loadvidsize'>0 byes</b> of <span id='vidsize'>N/A</span> megabytes in cache</div>"+
-                "<div> Link to this point of the video: <a id='pointLink' href='#'></a></div>"+
+                "<div> Deep link to this point of the video: <a id='deepLink' href='#'></a></div>"+
                 "<table id='grabVideos'><caption><span></span>Download video<small>"+
                 "in High quality and high definition</small></caption>"+
                 "<tr><th colspan='3'>Flash video</th><th class='divider'/>"+
@@ -481,6 +481,19 @@ youtube.require(
                 "<td class='divider'/><td class='medium _3gp'>3gp</td></tr></table>"
 
       );
+
+      settings=$('<div class="ytSettings">'+
+                  '<label>'+
+                    '<input type="checkbox" name="sticky"/>'+
+                    ' <b>Sticky</b>: Keep current user and related videos!</label>'+
+                '</div>');
+      settings.find('input').change(function(){
+        self.config[$(this).attr('name')]=
+        $(this).attr('checked');
+      });
+      $('#grabVideos').before(settings);
+
+
       $('#masthead').prepend('<p class="info">All links in this section work like regular ones, so be warned.</p>');
       var hist=$('<a class="yhistory"><span/>Been there, seen that</a>')
                  .attr('title', 'Videos watched in this session')
@@ -527,7 +540,7 @@ youtube.require(
           var c=i>0?'user':'related';
           $(this).addClass(c).find('a').attr('target','_blank');
       }).remove().appendTo('#newContent')},3000);
-      $('#pointLink').attr('target','_blank');
+      $('#deepLink').attr('target','_blank');
       $('#_loadingInfo').before('<div class="historyContainer"><div/>'+
         '<a href="#" class="r"/><a href="#" class="l"/></div>');
       $('.historyContainer div a').live('click',function(){
