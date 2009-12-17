@@ -435,8 +435,8 @@ youtube.require(
       });
       youtube.clickIt($('#watch-channel-videos-panel h2')[0]);
 
-      //$('<link rel="stylesheet" type="text/css" href="http://means.googlecode.com/svn/trunk/youtube/less.cowbell.css"/>').appendTo("head");
-       $('<link rel="stylesheet" type="text/css" href="http://www.smallmeans.com/apps/sitehilite/youtube/less.cowbell.css"/>').appendTo("head");
+      $('<link rel="stylesheet" type="text/css" href="http://means.googlecode.com/svn/trunk/youtube/less.cowbell.css"/>').appendTo("head");
+      // $('<link rel="stylesheet" type="text/css" href="http://www.smallmeans.com/apps/sitehilite/youtube/less.cowbell.css"/>').appendTo("head");
 
       $('<div class="humanized_msg"><p></p></div>').prependTo('body');
       $('#watch-other-vids >div:gt(1)').hide()
