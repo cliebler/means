@@ -485,7 +485,7 @@ youtube.require(
       settings=$('<div class="ytSettings">'+
                   '<label>'+
                     '<input type="checkbox" name="sticky"/>'+
-                    ' <b>Sticky</b>: Keep current user and related videos!</label>'+
+                    '<b>Sticky</b>: Keep current user and related videos!</label>'+
                 '</div>');
       settings.find('input').change(function(){
         self.config[$(this).attr('name')]=
