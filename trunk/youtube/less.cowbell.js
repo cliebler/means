@@ -337,10 +337,13 @@ var youtube={
   getCurrentTime:function(){
     return player.getCurrentTime();
   },
-  initplayer:function(currentVideoID) {
-    this.current=currentVideoID;
+  initplayer:function(videoID) {
+    this.current=videoID;
+    var u=yt.getConfig('VIDEO_USERNAME');
+    o={t:document.title, i:videoID, u:u, th:'http://i2.ytimg.com/vi/'+videoID+'/default.jpg'};
+    this.addHistory(o);
     var p='<object height="100%" width="100%" type="application/x-shockwave-flash"'+
-          'id="movie_player" data="/v/'+currentVideoID+'?enablejsapi=1&fs=1&showsearch=0&showinfo=0">'+
+          'id="movie_player" data="/v/'+videoID+'?enablejsapi=1&fs=1&showsearch=0&showinfo=0">'+
           '<param name="allowfullscreen" value="true"/>'+
           '<param name="allowScriptAccess" value="always"/>'+//mucho importante!
           '<param name="wmode" value="opaque"/></object>';
@@ -440,8 +443,9 @@ youtube.require(
       });
       youtube.clickIt($('#watch-channel-videos-panel h2')[0]);
 
-      //$('<link rel="stylesheet" type="text/css" href="http://means.googlecode.com/svn/trunk/youtube/less.cowbell.css"/>').appendTo("head");
-      $('<link rel="stylesheet" type="text/css" href="http://www.smallmeans.com/apps/sitehilite/youtube/less.cowbell.css"/>').appendTo("head");
+      var css="http://means.googlecode.com/svn/trunk/youtube/less.cowbell.css";
+      $('<link rel="stylesheet" type="text/css" href="'+css+'"/>').appendTo("head");
+
 
       $('<div class="humanized_msg"><p></p></div>').prependTo('body');
       $('#watch-other-vids >div:gt(1)').hide()
