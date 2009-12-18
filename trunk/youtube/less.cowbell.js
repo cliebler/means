@@ -378,7 +378,7 @@ var youtube={
   updatePlayerInfo:function(){
     $('#loadvidsize').text(this.getBytesLoaded());
     $('#vidsize').text(this.getSize());
-    $('#deepLink').attr('href','/watch?v='+this.current+'#t='+this.getCurrentTime());
+    $('#deepLink').attr('href','/watch?v='+this.current+'#t='+Math.round(this.getCurrentTime()));
   },
   onPlayerStateChange:function(state){
     if(!awaiting) return;
@@ -440,8 +440,8 @@ youtube.require(
       });
       youtube.clickIt($('#watch-channel-videos-panel h2')[0]);
 
-      $('<link rel="stylesheet" type="text/css" href="http://means.googlecode.com/svn/trunk/youtube/less.cowbell.css"/>').appendTo("head");
-      // $('<link rel="stylesheet" type="text/css" href="http://www.smallmeans.com/apps/sitehilite/youtube/less.cowbell.css"/>').appendTo("head");
+      //$('<link rel="stylesheet" type="text/css" href="http://means.googlecode.com/svn/trunk/youtube/less.cowbell.css"/>').appendTo("head");
+      $('<link rel="stylesheet" type="text/css" href="http://www.smallmeans.com/apps/sitehilite/youtube/less.cowbell.css"/>').appendTo("head");
 
       $('<div class="humanized_msg"><p></p></div>').prependTo('body');
       $('#watch-other-vids >div:gt(1)').hide()
@@ -576,7 +576,8 @@ youtube.require(
         return false;
       })
 
-      setTimeout("yt.net.delayed.load('channel')", 2000);
+      //setTimeout("yt.net.delayed.load('channel')", 1000);
+      yt.net.delayed.load('channel');
       yt.net.delayed.load('related');
       youtube.onClick('#watch-related-discoverbox');              
       youtube.onClick('#watch-channel-vids-body');
