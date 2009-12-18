@@ -55,6 +55,7 @@
 #watch-channel-videos-panel,
 #watch-comments-footer-table,
 #watch-video-response,
+#watch-shows-movies-rating,
 #promos,#footer .search,#masthead,
 #footer .region-and-language-pickers,
 #watch-this-vid-info .yt-uix-expander, 
@@ -71,6 +72,7 @@
 }
 #watch-channel-vids-div{
   display:block !important;
+  margin-bottom:12px !important;
 }
 .watch-discoverbox,#watch-channel-vids-body{
   height:auto !important;
@@ -92,7 +94,7 @@
   width:627px;
 }
 .watch-video-desc{
-  max-height:99px;
+  max-height:66px;
   overflow:hidden;
 }
 .watch-video-desc.expand{
@@ -420,4 +422,7 @@ p.info{
   height:60px;
   border:3px solid red;
   padding:1px;
+}
+#watch-other-vids>div{
+  margin:2px 0;
 }
