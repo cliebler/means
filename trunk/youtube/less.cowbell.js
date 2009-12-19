@@ -1,6 +1,7 @@
 
-//Youtubian v0.2, http://www.smallmeans.com/tools/youtubian
-//json stuff:http://gdata.ops.demo.googlepages.com/yt_json_codelab.html
+//Youtubian v0.2, 19 Dec 2009
+// http://www.smallmeans.com/tools/youtubian
+
 
 var player;
 var youtube={

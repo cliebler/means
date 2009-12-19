@@ -142,7 +142,10 @@
   border:1px solid red;
   padding:4px 3px;
 }
-#newContent .video-entry.been-there{                                                                    border:1px solid #A0CD5B;                                                                         }
+#newContent .video-entry.been-there{
+  background-color:#DDFF99;
+  border-color:#ddd;
+}
 #newContent .video-entry a img{
   border:1px solid #4d4c4c;
 }
@@ -382,7 +385,7 @@ p.info{
   float:right;
   margin-top:-33px;
 }
-.yhistory:hover,.headcoll{
+.yhistory:hover,.headcoll:hover{
   text-decoration:none;
 }
 .yhistory span{
