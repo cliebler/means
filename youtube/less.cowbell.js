@@ -156,10 +156,11 @@ var youtube={
       this.getRelatedVideos(id);
       if(user){
         this.getUserChannel(user);
+      }else{
+        $('#_loadingInfo').addClass('user');
       }
     }else{
-      $('#_loadingInfo').addClass('related');
-      $('#_loadingInfo').addClass('user');
+      $('#_loadingInfo').addClass('related user');
     }
     var targetOffset = $('#baseDiv').offset().top;
     $('html,body').animate({scrollTop: targetOffset}, 1000);
