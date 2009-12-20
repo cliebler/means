@@ -555,8 +555,10 @@ youtube.require(
         _self.setTitle(o.t);
         return false;
       })
-      $('#watch-video-details-toggle a:eq(0)').get(0).onclick=function(){
-        $('.watch-video-desc:eq(0)').toggleClass('expand');
+      var t=$('#watch-video-details-toggle a:eq(0)');
+      t.html('<span class="m">more info</span><span class="l">less info</span>');
+      t.get(0).onclick=function(){
+        $('#watch-channel-vids-div').toggleClass('expand');
         return false;
       }
       $('#watch-channel-icon a.url,#watch-channel-stats>a')
