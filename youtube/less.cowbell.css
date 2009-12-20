@@ -93,11 +93,17 @@
 #watch-video-response{
   width:627px;
 }
+.expand span.m,span.l{
+  display:none;
+}
+.expand span.l{
+  display:inline;
+}
 .watch-video-desc{
   max-height:66px;
   overflow:hidden;
 }
-.watch-video-desc.expand{
+.expand .watch-video-desc{
    max-height:inherit;
 }
 #watch-video-details{
