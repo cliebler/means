@@ -484,6 +484,7 @@ youtube.require(
                 "<th colspan='2'>MPEG-4</th><th class='divider'/><th colspan='2'>Mobile</th></tr>"+
                 "<tr><td class='small flv'>LQ</td><td class='medium flv'>Normal</td><td class='large flv'>HQ</td>"+
                 "<td class='divider'/><td class='medium mp4'>HQ</td><td class='hd720 mp4'>HD</td>"+
+                "<td class='hd1080 mp4'>Full HD</td>"+
                 "<td class='divider'/><td class='medium _3gp'>3gp</td></tr></table>"
 
       );
