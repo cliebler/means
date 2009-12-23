@@ -350,6 +350,7 @@ var youtube={
           '<param name="allowScriptAccess" value="always"/>'+//mucho importante!
           '<param name="wmode" value="opaque"/></object>';
     $('#watch-player-div').html(p);
+    $('#_loadingstuff').hide();
   },
   sortByDuration:function(){
     jQuery("#newContent .video-entry").tsort(".video-time",{order:"desc",attr:"duration"});
@@ -401,7 +402,6 @@ var youtube={
   },
   init:function(){
     _self=this;
-    this.yell('Loading stuff.. hold your breath..');
     this.initplayer(this.getNeedle('v',document.location));
   }
 }
@@ -443,6 +443,11 @@ youtube.require(
           }
         }
       });
+      var st="position: absolute;width:99%; color: white;background-color: #8CC63F;"+
+             "font-size: 31pt; text-align: center;top:7%;padding:10px 4px; z-index:999;";
+      $('<div/>').attr('id','_loadingstuff').text('Loading stuff.. hold on').attr('style',st).appendTo('body');
+
+
       youtube.clickIt($('#watch-channel-videos-panel h2')[0]);
 
       var css="http://means.googlecode.com/svn/trunk/youtube/less.cowbell.css";

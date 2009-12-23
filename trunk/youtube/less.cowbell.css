@@ -309,7 +309,7 @@
 #grabVideos.small.medium td.medium,
 #grabVideos td._3gp,
 #grabVideos.small td.small{
-  /*display:block;*/
+  display:block;
 }
 */
 #grabVideos caption{
