@@ -295,15 +295,16 @@
   color:blue;
   cursor:pointer;
 }
+#grabVideos td.hd1080{
+  display:none;
+}
+
 /*
 #grabVideos.small td.medium,
 #grabVideos.small.medium td.small,
 #grabVideos td.hd1080,
 #grabVideos td.small{
   display:none;
-}
-#grabVideos.hd1080 td.hd1080{
-  /*display:block;*/
 }
 #grabVideos.small.medium td.medium,
 #grabVideos td._3gp,
