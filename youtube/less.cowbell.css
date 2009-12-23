@@ -290,15 +290,20 @@
 #grabVideos.small td.small,
 #grabVideos.large td.large,
 #grabVideos.medium td.medium,
-#grabVideos.hd720 td.hd720{
+#grabVideos.hd720 td.hd720,
+#grabVideos.hd1080 td.hd1080{
   color:blue;
   cursor:pointer;
 }
 /*
 #grabVideos.small td.medium,
 #grabVideos.small.medium td.small,
+#grabVideos td.hd1080,
 #grabVideos td.small{
   display:none;
+}
+#grabVideos.hd1080 td.hd1080{
+  display:block;
 }
 #grabVideos.small.medium td.medium,
 #grabVideos td._3gp,
