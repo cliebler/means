@@ -36,7 +36,8 @@
 }
 .watch-wide-mode #watch-this-vid-info{
   width:66%;
-  margin-top:38px;
+}
+.watch-wide-mode #watch-ratings-views{
 }
 .watch-wide-mode #watch-other-vids {
   float:right;
@@ -44,6 +45,16 @@
 }
 .watch-wide-mode #watch-vid-title.longform{
   width:84%;
+}
+.watch-wide-mode #watch-this-vid{
+  background-color:inherit;
+}
+.watch-wide-mode #watch-this-vid #watch-player-div #movie_player{
+  margin-left:0;
+}
+.watch-wide-mode #watch-player-div{
+  background-color:#000;
+  -moz-border-radius:7px;
 }
 #watch-vid-title h1{
   text-align:left;
@@ -125,6 +136,7 @@
 #newContent.comments #watch-comment-panel,
 #newContent.user #watch-channel-vids-body,
 #newContent.user .watch-discoverbox-more-link.user,
+#newContent.results .watch-discoverbox-more-link.results,
 #newContent.related .watch-discoverbox-more-link.related{
   display:block;
 }
@@ -221,7 +233,7 @@
   background:#EAEAEA none repeat scroll 0 0;
   border:1px solid #CCCCCC;
   line-height:2em;
-  margin:0.23em 0 0.6em;
+  margin:0 0 0.6em;
   padding:0.15em 0.2em;
   white-space:nowrap;
 }
@@ -232,11 +244,13 @@
   padding:4px 1px 1px;
   vertical-align:top;
   width:19em;
+  color:#999;
 }
 #watch-other-vids .search-term-focus{
   border:2px solid #BBDAFD !important;
   margin-top:0;margin-bottom:0;
   padding-right:1px;padding-left:1px;
+  color:#000;
 }
 #watch-other-vids .search-form .yt-button {
   font-size:0.92308em;
@@ -414,6 +428,17 @@ p.info{
   text-align:right;
   padding:4px 3px 4px 0;
   -moz-border-radius:3px;
+}
+.historyContainer{
+  box-shadow: 0 0 8px #aaa;
+  -moz-box-shadow: 0 0 8px #aaa;
+  -webkit-box-shadow: 0 0 8px #aaa;
+}
+#watch-player-div{
+  box-shadow: 0 0 18px #333;
+  -moz-box-shadow: 0 0 18px #333;
+  -webkit-box-shadow: 0 0 18px #333;
+  margin-bottom:8px;
 }
 .historyContainer div{
   width:1000px;
