@@ -457,7 +457,6 @@ youtube.require(
       youtube.clickIt($('#watch-channel-videos-panel h2')[0]);
 
       var css="http://means.googlecode.com/svn/trunk/youtube/less.cowbell.css";
-      var css="http://www.smallmeans.com/apps/sitehilite/youtube/less.cowbell.css";
       $('<link rel="stylesheet" type="text/css" href="'+css+'"/>').appendTo("head");
 
 
