@@ -58,6 +58,7 @@
 }
 #watch-vid-title h1{
   text-align:left;
+  margin-bottom:10px;
 }
 #watch-other-vids{
   float:left;
@@ -98,8 +99,9 @@
   height:auto !important;
 }
 #watch-ratings-views{
-  width:638px;
   text-align:center;
+  margin-bottom:2px;
+  padding:6px 0 4px;
 }
 #watch-video-response{
   width:627px;
