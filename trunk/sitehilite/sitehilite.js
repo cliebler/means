@@ -135,6 +135,7 @@ javascript: (function(){
       var needles=phrase
             .replace(/("|^\s+|\s+$)/g,"") //unquote,trim
             .replace(this.config.stopwords,"")
+            .replace(/([=])/g," ")//delete some
             .replace(/(['-.*+?^${}()|[\]\/\\])/g, "\\$1")//escape some
             .replace(/[\s,]+/g, "|");//expand by space and comma
             
@@ -539,7 +540,9 @@ javascript: (function(){
           .find('input').bind('change', function(){
             _self.changeIsGonnaCome(jQ(this).attr('name'),jQ(this).attr('checked'));
           });
-      if(document.domain=="www.smallmeans.com"){this.config.content='#content';this.demo='A bookmarklet is a browser tool'}
+      if(this.isbkmklet&&document.domain=="www.smallmeans.com"){
+        this.config.content='#content';this.demo='A bookmarklet is a browser tool'
+      }
       this.search(phrase);
     }
   }
