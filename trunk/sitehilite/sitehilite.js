@@ -291,8 +291,7 @@ javascript: (function(){
         jQ(c).toggle(reveal);
         return;
       }
-      var a=jQ('<a>nothing happened</a>')
-            .click(function(){_self.dismiss();});
+      var a=jQ('<a>cancel</a>').click(_self.dismiss);
       var b=jQ("<input type='button' value='Go!'>")
               .bind('click',function(){
                  jQ('._hiliteCont').show()
@@ -303,12 +302,9 @@ javascript: (function(){
                  _self.search(jQ(this).prev().val(),isRegex);
              });
       var lb=jQ('<label><input type="checkbox">Treat as regular expression</label>');
-      jQ(c)
-        /*.append("Oops... Couldn't find the word you were looking for..<br/>")*/
-        .append("Pretend ").append(a)
-        .append(" or enter your search below:<br/>"+
-                "<input title='Partial words are OK, separate by space'"+
-                " class='txt' type='text' size='38'>")
+      jQ(c).append("Enter your search below (or ").append(a).append(")<br/>"+
+           "<input title='Partial words are OK, separate by space'"+
+           " class='txt' type='text' size='38'>")
         .append(b).append(lb).show().find('input:eq(0)').focus().val(this.demo||'');
         jQ('._hiliteCont').hide();
     },
