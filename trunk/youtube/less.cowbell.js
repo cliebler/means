@@ -2,7 +2,6 @@
 //Youtubian v0.2, 19 Dec 2009
 // http://www.smallmeans.com/tools/youtubian
 
-
 var player;
 var youtube={
   errors:{
@@ -31,7 +30,6 @@ var youtube={
     maxRelated:40,
     maxFavd:20
   },
-  history:{},
   require: function (src, callback) {
     var c = document.createElement("script");
     c.src = src;
@@ -90,13 +88,8 @@ var youtube={
     el && el.dispatchEvent(evt); 
   },
   getFlashVar:function(name){
-    var o=jQuery("#watch-player-div embed").attr('flashvars');
+    var o=$(player).attr('flashvars');
     return this.getNeedle(name, o);
-  },
-  assign:function(variables, values, scope){
-    for(var i = 0; i < variables.length && i < values.length; i++){
-      (scope || this)[variables[i]] = values[i];
-    }
   },
   getMetaData:function(o){
     var t=o.title.$t;
@@ -246,7 +239,6 @@ var youtube={
       //callback context is now window
       content = _self.getVideoEntryDOM.apply(_self, [entry]);
       html.push(content);
-      //if(!entry.yt$noembed)
     }
     $(container).html(html.join(''));
     _self.onClick(container);
@@ -262,14 +254,13 @@ var youtube={
       $('#_loadingInfo').addClass('user');
       $("#watch-channel-vids-body").html($(xml).find('html_content').text());
       yt.net.delayed.load('channel');
-      //_self.onClick('#watch-channel-vids-body');
       _self.addMetaData('#watch-channel-vids-body');
       $('.watch-discoverbox-more-link.user')
          .html($('#watch-channel-vids-body .watch-discoverbox-more-link a').attr('target','_blank').remove());
     },'xml');
   },
   getVideoComments:function(id){
-/*
+    /*
 	yt.setConfig({
 	  'VIDEO_ID':id,
 	  'COMMENTS_THRESHHOLD': -5,
@@ -278,7 +269,7 @@ var youtube={
 	  'COMMENTS_PAGE_SIZE': 10
 	});
 	yt.www.comments.viewing.onWatchCommentsShowMore();
-*/
+    */
     var count=10;
     var url="/watch_ajax";
     var args={
@@ -327,8 +318,8 @@ var youtube={
       setTimeout(arguments.callee, 1100);
       return;
     }
-    awaiting=true;
-    player.loadVideoById(_self.current);
+    await=true;
+    player.loadVideoById(id||_self.current);
   },
   setHD:function() {
     player.setPlaybackQuality('hd720');
@@ -344,19 +335,6 @@ var youtube={
   },
   getCurrentTime:function(){
     return player.getCurrentTime();
-  },
-  initplayer:function(videoID) {
-    this.current=videoID;
-    var u=yt.getConfig('VIDEO_USERNAME');
-    o={t:document.title, i:videoID, u:u, th:'http://i2.ytimg.com/vi/'+videoID+'/default.jpg'};
-    this.addHistory(o);
-    var p='<object height="100%" width="100%" type="application/x-shockwave-flash"'+
-          'id="movie_player" data="/v/'+videoID+'?enablejsapi=1&fs=1&showsearch=0&showinfo=0">'+
-          '<param name="allowfullscreen" value="true"/>'+
-          '<param name="allowScriptAccess" value="always"/>'+//mucho importante!
-          '<param name="wmode" value="opaque"/></object>';
-    $('#watch-player-div').html(p);
-    $('#_loadingstuff').hide();
   },
   sortByDuration:function(){
     jQuery("#newContent .video-entry").tsort(".video-time",{order:"desc",attr:"duration"});
@@ -393,31 +371,32 @@ var youtube={
     $('#deepLink').attr('href','/watch?v='+this.current+'#t='+Math.round(this.getCurrentTime()));
   },
   onPlayerStateChange:function(state){
-    if(!awaiting) return;
-    switch(state){
-      case 5://cue state
-       awaiting=true;
-      break;
-      case 1://play
-       if(awaiting){
-         _self.videoReady.apply(_self);
-       }
-       awaiting=false;
-      break;
+    this.log('state:'+state);
+    if(state==1){
+      if(await){
+        _self.videoReady.apply(_self);
+        await=false;
+      }
     }
   },
-  init:function(){
+  init:function(videoID){
     _self=this;
-    this.initplayer(this.getNeedle('v',document.location));
+    o={
+      t:document.title, u:yt.getConfig('VIDEO_USERNAME'),
+      i:videoID,th:'http://i2.ytimg.com/vi/'+videoID+'/default.jpg'
+    };
+    this.addHistory(o);    
+    this.current=videoID;
+    $("#movie_player").attr("wmode", "opaque").wrap('<div>');
   }
 }
-//callback when player is ready
-onYouTubePlayerReady=function(playerId) {
-  player=jQuery("#movie_player").get(0);
-  player.addEventListener("onError", "youtube.onPlayerError"); 
+function onYouTubePlayerReady(id){
+  $('#_loadingstuff').hide();
+  player=$("#movie_player").get(0);
+  player.addEventListener("onError", "youtube.onPlayerError");
   player.addEventListener("onStateChange", "youtube.onPlayerStateChange");
-  setInterval(function(){youtube.updatePlayerInfo()}, 500);
-  youtube.playVideo(youtube.current);
+  setInterval(function(){_self.updatePlayerInfo()}, 500);
+  _self.playVideo.apply(_self);
 }
 
 //-------- all that was just the cake, let's put the icing on --------
@@ -437,7 +416,7 @@ youtube.require(
         },
         getVideoID: function(){
           return $(this).is('a') &&
-           youtube.getNeedle('v',$(this).attr('href'));
+           _self.getNeedle('v',$(this).attr('href'));
         },
         activate: function(isvideo){
           var c='active been-there';
@@ -449,10 +428,17 @@ youtube.require(
           }
         }
       });
+      var msg,videoID=youtube.getNeedle('v',document.location);
+      if(!videoID){
+        msg="Apparently, you're not on a video page."+
+        "<br/>How about clickin' on <a href='/watch?v=P6VUNnC3QdE'>this one</a>, huh?.....";
+      }else{
+        msg="Loading stuff.. hold on";
+      }
       var st="position: absolute;width:99%; color: white;background-color: #8CC63F;"+
              "font-size: 31pt; text-align: center;top:7%;padding:10px 4px; z-index:999;";
-      $('<div/>').attr('id','_loadingstuff').text('Loading stuff.. hold on').attr('style',st).appendTo('body');
-
+      $('<div/>').attr('id','_loadingstuff').html(msg).attr('style',st).appendTo('body');
+      if(!videoID){return;}
 
       youtube.clickIt($('#watch-channel-videos-panel h2')[0]);
 
@@ -470,9 +456,11 @@ youtube.require(
           '<div id="watch-result-discoverbox" class="watch-discoverbox">'+
           '<div class="_loadingInfo">....if you\'re reading this, it is a slow day at work..</div></div>');
       $("#watch-this-vid").append(
-          '<div id="_loadingInfo">Hard at work getting <span class="info">video info</span>, '+
-          ' <span class="comm">comments</span>, <span class="user">user channel</span>'+
-          ' and <span class="related">related videos</span></div>');
+          '<div id="_loadingInfo">Working on '+
+          ' <span class="related">related videos</span>, '+
+          ' <span class="info">description</span>, '+
+          ' <span class="comm">comments</span>, and '+
+          ' <span class="user">user channel</span></div>');
 
       $("<div class='tabs'>"+
            "<span>Order videos by: <a href='#'>views</a><a href='#'>duration</a></span>"+
@@ -616,13 +604,12 @@ youtube.require(
         return false;
       })
 
-      //setTimeout("yt.net.delayed.load('channel')", 1000);
       yt.net.delayed.load('channel');
       yt.net.delayed.load('related');
       youtube.onClick('#watch-related-discoverbox');              
       youtube.onClick('#watch-channel-vids-body');
-      youtube.init();
-      //yt.www.watch.player.enableWideScreen(!_hasclass(_gel('baseDiv'), 'watch-wide-mode'), true);
+
+      //all systems go!
+      youtube.init(videoID);
   })(jQuery);
 });
-           
