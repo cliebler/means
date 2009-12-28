@@ -15,8 +15,9 @@ javascript: (function(){
       enableInput:true,
       beginsWith:true,
       endsWith:false,
-      content:'body',
+      lightsOff:true,
       colorify:false,
+      content:'body',
       minLength:3,
       navMenu:{
         show: true,
@@ -93,7 +94,7 @@ javascript: (function(){
       document.onkeydown=this.oldOnkey;      
       jQ('._hiliteword').attr('class','');
       jQ('._hiliteCont,.sitehiliteCurtain,#sitehiliteInfo,#sitehiliteCSS').remove();
-      jQ('body').removeClass('sitehiliteEnabled enableHilite '+
+      jQ('body').removeClass('sitehiliteEnabled lightsOff enableHilite '+
                 'enableArrowKeys showHilitrMenu hilitetop colorify');
       
     },
@@ -514,7 +515,7 @@ javascript: (function(){
         .append(
           '<label><input type="checkbox" name="enableHilite" checked>Highlight ON|OFF</label>'+
           '<label><input type="checkbox" name="colorify">Colors, please!</label>'+
-          '<label><input type="checkbox" name="lightsOff">Lights out</label>'+
+          '<label><input type="checkbox" name="lightsOff" checked>Lights out</label>'+
          '<label title="Use the LEFT,RIGHT arrow keys to move back and forth">'+
           '<input type="checkbox" name="enableArrowKeys" checked>Use arrow keys</label>'+
           '<label ><input type="checkbox" name="sitehiliteContextualize" disabled>Show in context</label>'
@@ -527,6 +528,7 @@ javascript: (function(){
       var klass='sitehiliteEnabled enableHilite '+
                 (this.config.navMenu.position=='top'?'hilitetop':'hilitebottom')+
                 (this.config.navMenu.show?' showHilitrMenu':'')+
+                (this.config.lightsOff?' lightsOff':'')+
                 (this.config.colorify?' colorify':'');
       this.attachKeys();
       jQ('script').remove();
