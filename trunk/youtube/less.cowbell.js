@@ -32,11 +32,16 @@ var youtube={
   },
   require: function (src, callback) {
     var c = document.createElement("script");
-    c.src = src;
+
     c.type = "text/javascript";
     if (callback) {
       c.onload = callback;
-    }
+      c.onreadystatechange=function(){
+        if(c.readyState == 'loaded' || c.readyState == 'complete'){
+          callback();
+        }
+      }
+    }    c.src = src;
     document.getElementsByTagName("head")[0].appendChild(c);
   },
   log: function () {
@@ -83,9 +88,14 @@ var youtube={
     return m && m[1];
   },
   clickIt:function(el){
-    var evt = document.createEvent("HTMLEvents");
-    evt.initEvent("click", true, true);
-    el && el.dispatchEvent(evt); 
+    if (document.createEventObject){
+      var evt = document.createEventObject();
+      el && el.fireEvent('onclick',evt);
+    }else{
+      var evt = document.createEvent("MouseEvents");
+      evt.initEvent("click", true, true);
+      el && el.dispatchEvent(evt); 
+    }
   },
   getFlashVar:function(name){
     var o=$(player).attr('flashvars');
@@ -121,7 +131,7 @@ var youtube={
                '   <div class="video-view-count">'+t.views+' views</div>'+
                '   <div class="video-username"><a href="/user/'+t.user+'">'+t.user+'</a></div>'+
                ' </div>'+
-               ' <div class="video-clear-list-left"/>'+
+               ' <div class="video-clear-list-left"></div>'+
             '</div>';
   },
   setVideoData:function(data){
@@ -158,8 +168,12 @@ var youtube={
     }else{
       $('#_loadingInfo').addClass('related user');
     }
-    var targetOffset = $('#baseDiv').offset().top;
-    $('html,body').animate({scrollTop: targetOffset}, 1000);
+    if($.browser.opera){
+      $('#baseDiv').get(0).scrollIntoView()
+    }else{
+      var targetOffset = $('#baseDiv').offset().top;
+      $('html,body').animate({scrollTop: targetOffset}, 1000);
+    }
   },
   onClick:function(context){
     var css=".video-entry > a, .video-entry .video-mini-title a";
@@ -236,7 +250,6 @@ var youtube={
     var next = data.feed.link[4]&&data.feed.link[4].href || '';
     var html = [], content='';
     for (var i = 0, entry; entry = entries[i]; i++) {
-      //callback context is now window
       content = _self.getVideoEntryDOM.apply(_self, [entry]);
       html.push(content);
     }
@@ -272,14 +285,7 @@ var youtube={
     */
     var count=10;
     var url="/watch_ajax";
-    var args={
-      v:id,
-      action_get_comments:1,
-      p:1,
-      commenatthreshold:-5,
-      commentfilter:0,
-      page_size:count
-    };
+    var args={v:id, action_get_comments:1, p:1,  commenatthreshold:-5, commentfilter:0, page_size:count};
     yt.setConfig('VIDEO_ID', id);
     $.get(url, args,function(xml){
       $("#recent_comments").html($(xml).find('html_content').text());
@@ -302,13 +308,6 @@ var youtube={
       var uri=_self.getDownloadURL(_self.current, token, format);
       callback && callback(uri);
     });
-  },
-  makeArray:function(obj) {
-    var a=[];
-    $.each(obj,function(k,v){
-      a.push(v);
-    });
-    return a;    
   },
   playVideo:function(id, from, quality) {
     if(!player||!player.loadVideoById){
@@ -343,7 +342,7 @@ var youtube={
     jQuery("#newContent .video-entry").tsort(".video-view-count",{order:"desc",attr:"views"});
   },
   videoReady:function(){
-    var c=this.makeArray(player.getAvailableQualityLevels());
+    var c=player.getAvailableQualityLevels();
     c.push('small','_3gp');
     $('#grabVideos').attr('class',c.join(' '));
     this.available=c;
@@ -363,7 +362,7 @@ var youtube={
     setTimeout(function(){$('.humanized_msg').fadeOut()}, 2300);
   },
   onPlayerError:function(code){
-    _self.yell(this.errors[code] || 'Gah! Unknown error occured.')
+    _self.yell(this.errors[code] || 'Gah! Unknown error occured ('+code+')')
   },
   updatePlayerInfo:function(){
     $('#loadvidsize').text(this.getBytesLoaded());
@@ -372,34 +371,41 @@ var youtube={
   },
   onPlayerStateChange:function(state){
     this.log('state:'+state);
-    if(state==1){
-      if(await){
-        _self.videoReady.apply(_self);
-        await=false;
-      }
+    if(state==1 && await){
+      _self.videoReady.apply(_self);
+      await=false;
     }
   },
   init:function(videoID){
     _self=this;
-    o={
-      t:document.title, u:yt.getConfig('VIDEO_USERNAME'),
-      i:videoID,th:'http://i2.ytimg.com/vi/'+videoID+'/default.jpg'
+    var o={
+         t:document.title, u:yt.getConfig('VIDEO_USERNAME'),
+         i:videoID,th:'http://i2.ytimg.com/vi/'+videoID+'/default.jpg'
     };
     this.addHistory(o);    
     this.current=videoID;
-    $("#movie_player").attr("wmode", "opaque").wrap('<div>');
+    var em=$("#movie_player").attr("wmode", "opaque").remove();
+    $("#watch-player-div").append(em);
+
   }
 }
 function onYouTubePlayerReady(id){
+  _self.log('API ready..')
   $('#_loadingstuff').hide();
   player=$("#movie_player").get(0);
-  player.addEventListener("onError", "youtube.onPlayerError");
-  player.addEventListener("onStateChange", "youtube.onPlayerStateChange");
+  if(window.addEventListener){
+    player.addEventListener("onError", "youtube.onPlayerError");
+    player.addEventListener("onStateChange", "youtube.onPlayerStateChange");
+  }else{
+    player.attachEvent("onStateChange", "youtube.onPlayerStateChange");
+  }
   setInterval(function(){_self.updatePlayerInfo()}, 500);
   _self.playVideo.apply(_self);
 }
 
-//-------- all that was just the cake, let's put the icing on --------
+  //
+ // all that was just the cake,
+//  let's put the icing on..
 
 
 youtube.require(
@@ -554,7 +560,8 @@ youtube.require(
       $('#deepLink').attr('target','_blank');
       $('#_loadingInfo').before('<div class="historyContainer"><div/>'+
         '<a href="#" class="r"/><a href="#" class="l"/></div>');
-      $('.historyContainer div a').live('click',function(){
+      $('.historyContainer div a').live('click',function(e){
+        if(e.button!=0){return true;}
         var o=$(this).data('stuff');
         _self.current=o.i;
         _self.requestVideo(o.i,o.u);
