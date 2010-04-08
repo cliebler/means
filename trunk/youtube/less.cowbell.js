@@ -434,6 +434,9 @@ youtube.require(
           }
         }
       });
+
+
+
       var msg,videoID=youtube.getNeedle('v',document.location);
       if(!videoID){
         msg="Apparently, you're not on a video page."+
@@ -441,9 +444,18 @@ youtube.require(
       }else{
         msg="Loading stuff.. hold on";
       }
-      var st="position: absolute;width:99%; color: white;background-color: #8CC63F;"+
-             "font-size: 31pt; text-align: center;top:7%;padding:10px 4px; z-index:999;";
+
+link="<br/><br/><small>..meanwhile, <a href='#'  id='diss'>enjoy your video</a>.</small>";
+msg="Recent MAJOR changes on Youtube pages broke this tool.<br>An (equally major) update is coming in few days.."+link;
+
+      var st="position: absolute;width:99%; color: white;background-color:#8CC63F;"+
+             "font-size: 24pt; text-align: left;top:36%;padding:10px 4px; z-index:999;";
       $('<div/>').attr('id','_loadingstuff').html(msg).attr('style',st).appendTo('body');
+var o=$("#movie_player").attr("wmode", "opaque").remove();
+$("#watch-player").append(o);
+$('#diss').click(function(){$('#_loadingstuff').hide();return false;});
+      return;
+
       if(!videoID){return;}
 
       youtube.clickIt($('#watch-channel-videos-panel h2')[0]);
