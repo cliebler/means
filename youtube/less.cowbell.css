@@ -385,14 +385,14 @@
   position: absolute;width:99%;
   color: white;background-color: #8CC63F;
   font-size: 31pt; text-align: center;
-  opacity:0.9;top:47%;padding:10px 4px;
+  opacity:0.85;top:47%;padding:10px 4px;
   z-index:999;display:none;
 }
 
 .humanized_msg p{ padding:10px 54px; display: inline;background-color: #8CC63F;}
 
 .yhistory{
-  margin-left:-18px;
+  margin-left:-49px;
   cursor:pointer;
   padding: 5px 7px 8px 8px;
   background-color:#eee;
