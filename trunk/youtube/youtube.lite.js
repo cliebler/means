@@ -433,8 +433,8 @@ function initDOM($,conf){
    $('<div>').attr('id','_loadingstuff').html(msg).attr('style',st).appendTo('body');  
   if(!videoID){return;}
 
+  var css="http://localhost/youtubian/less.cowbell.css";
   var css="http://means.googlecode.com/svn/trunk/youtube/less.cowbell.css";
-var css="http://localhost/youtubian/less.cowbell.css";
   $('<link rel="stylesheet" type="text/css" href="'+css+'"/>').appendTo("head");
 
   $('<div class="humanized_msg"><p></p></div>').prependTo('body');
