@@ -1,470 +1,535 @@
-/*ads and other sheit*/
-#watch-url-embed-wrapper,
-#watch-channel-brand-cap,
-#watch-channel-brand-div{
-  display:none;
+body{
+	opacity: 0.2;
 }
-
+body.ytnEnabled{
+	opacity: 1;
+}
+#watch-actions .action-bar-ratings-stats{
+	border-color: #ddd;
+}
+#watch-panel #watch-actions-left .likes-bar{
+	background: #aada37;
+	border-color: #698a14;
+}
+#watch-panel #watch-actions-left .dislikes-bar{
+	background: #cf362f;
+	border-color: #881811;
+}
+#watch-url-embed-wrapper,#watch-channel-brand-cap,#watch-channel-brand-div,#watch-info-shmoovie-sidebar,#watch-info{
+	display: none;
+}
 #watch-main-area{
-  border:none;
+	border: none;
 }
-#watch-rating-div, #footer,
-#watch-rating-div #ratingWrapper{
-  width:auto;
+#watch-video-container-info.wide,#watch-rating-div,#footer,#watch-rating-div #ratingWrapper{
+	width: auto;
 }
-#masthead,#masthead-utility,#masthead-nav-main,#player-open-popup,
-#masthead-nav-user, #masthead-utility{
-  xdisplay:none;
+#watch-panel{
+	margin-left: -15px;
+	width: 100%;
 }
 #masthead-container{
+	text-align: right;
 }
 #masthead-container a.headcoll{
-  margin:7px 7px 7px 0px;
+	margin: 7px 10px 0px 6px;
 }
 #masthead-search{
-  margin-right:4.5em;
+	margin-right: 4.5em;
 }
-#watch-this-vid-info{
-  width:84%;
-  margin-bottom:30px;
+#watch-video-container{
 }
-#watch-this-vid-info.wide{
-  width:auto;
+#watch-video-container-info{
+	margin-bottom: 30px;
+	width: 84%;
 }
-.watch-wide-mode .tabs > a {
-  padding:8px 3px;
+.watch-wide-mode .tabs > a{
+	padding: 8px 3px;
 }
-.watch-wide-mode #watch-this-vid-info{
-  width:66%;
+#watch-video.wide #rightSideContent{
+	display: none;
 }
-.watch-wide-mode #watch-ratings-views{
+#watch-video{
+	width: auto;
 }
-.watch-wide-mode #watch-other-vids {
-  float:right;
-  margin:50px 0;
+#watch-channel-videos-panel,#watch-comments-footer-table,#watch-video-response,#watch-shows-movies-rating,#promos,#footer .search,#masthead,#footer .region-and-language-pickers,#watch-video-container-info .yt-uix-expander,#newContent .video-list-item .video-username,#watch-channel-discoverbox,#newContent.user #watch-related,#watch-related,#watch-result-discoverbox,#watch-discoverbox-wrapper,#watch-description .watch-extra-info,#watch-discussion,#watch-main-area,#watch-discussion .comments-pagination button,#watch-discussion .comments-pagination .yt-uix-pager-link,#watch-actions-center,#watch-actions-right,#watch-actions-left button,#watch-views .watch-expander-body,.watch-module,#watch-views br,#comments-post,#watch-description button,#watch-sidebar,#watch-headline-user-info,.footer-links,.video-actions button,.watch-discoverbox-more-link,#watch-url-div,#watch-stats-data-wrapper{
+	display: none;
 }
-.watch-wide-mode #watch-vid-title.longform{
-  width:84%;
+#watch-headline{
+	padding: 0 0 5px;
 }
-.watch-wide-mode #watch-this-vid{
-  background-color:inherit;
+#rightSideContent{
+	float: right;
+	padding: 0 4px;
+	position: relative;
+	z-index: 99;
 }
-.watch-wide-mode #watch-this-vid #watch-player-div #movie_player{
-  margin-left:0;
+#rightSideContent,#srchOpt{
+	width: 324px;
 }
-.watch-wide-mode #watch-player-div{
-  background-color:#000;
-  -moz-border-radius:7px;
+#watch-container{
+	padding: 1px 5px 1px 10px;
 }
-#watch-vid-title h1{
-  text-align:left;
-  margin-bottom:10px;
+#watch-related,#watch-result-discoverbox,#watch-discussion,#watch-channel-discoverbox{
+	border: 1px solid #d3d3d3;
+	border-radius: 3px;
+	height: auto !important;
+	margin: 0;
+	-moz-border-radius: 3px;
+	overflow: auto;
+	padding: 15px 0 60px 5px;
+	-webkit-border-radius: 3px;
 }
-#watch-other-vids{
-  float:left;
-  margin-left:15px;
+#watch-views button{
+	margin-left: 5px;
 }
-#watch-channel-videos-panel,
-#watch-comments-footer-table,
-#watch-video-response,
-#watch-shows-movies-rating,
-#promos,#footer .search,#masthead,
-#footer .region-and-language-pickers,
-#watch-this-vid-info .yt-uix-expander, 
-#newContent .video-entry .video-username,
-#watch-channel-vids-body,
-#newContent.user #watch-related-discoverbox,
-#watch-related-discoverbox,
-#watch-result-discoverbox,
-#watch-discoverbox-wrapper,
-#watch-comment-panel, #watch-main-area,
-.watch-discoverbox-more-link,#watch-url-div,
-#watch-stats-data-wrapper{
-  display:none;
+#watch-actions{
+	height: auto;
+	padding-bottom: 0;
+	text-align: center;
 }
-#watch-channel-vids-div{
-  display:block !important;
-  margin-bottom:12px !important;
+#watch-views,#watch-actions-left{
+	margin-top: -4px;
 }
-.watch-discoverbox,#watch-channel-vids-body{
-  height:auto !important;
-  border:1px solid #ddd;
-  border-width:0 1px 1px;
-  padding-top:15px;
+span.l,span.m{
+	float: right;
 }
-.watch-discoverbox,
-#watch-channel-discoverbox,#watch-channel-vids-body{
-  margin:0;
-  padding-left:0;
-  height:auto !important;
+.yt-uix-expander-collapsed span.l,span.m{
+	display: none;
 }
-#watch-ratings-views{
-  text-align:center;
-  margin-bottom:2px;
-  padding:6px 0 4px;
+.yt-uix-expander-collapsed span.m,span.l{
+	display: inline;
 }
-#watch-video-response{
-  width:627px;
+#eow-description-short{
+	max-height: inherit;
+	overflow: hidden;
 }
-.expand span.m,span.l{
-  display:none;
-}
-.expand span.l{
-  display:inline;
-}
-.watch-video-desc{
-  max-height:66px;
-  overflow:hidden;
-}
-.expand .watch-video-desc{
-   max-height:inherit;
+.yt-uix-expander-collapsed #eow-description-short{
+	max-height: 105px;
+	white-space: normal !important;
 }
 #watch-video-details{
-  padding-bottom:7px;
-}
-#watch-channel-discoverbox{
-  padding-top:0;
-  border:none;
-}
-.watch-discoverbox{
-  padding-bottom:57px;
+	padding-bottom: 7px;
 }
 #newContent{
-  margin-top:9px;
+	xmargin-top: -10px;
 }
-
-#newContent.related #watch-related-discoverbox,
-#newContent.results #watch-result-discoverbox,
-#newContent.comments #watch-comment-panel,
-#newContent.user #watch-channel-vids-body,
-#newContent.user .watch-discoverbox-more-link.user,
-#newContent.results .watch-discoverbox-more-link.results,
-#newContent.related .watch-discoverbox-more-link.related{
-  display:block;
+#newContent.related #watch-related,#newContent.results #watch-result-discoverbox,#newContent.comments #watch-discussion,#newContent.user #watch-channel-discoverbox,#newContent.user .watch-discoverbox-more-link.user,#newContent.results .watch-discoverbox-more-link.results,#newContent.related .watch-discoverbox-more-link.related{
+	display: block;
 }
 .mini-list-view .video-main-content{
-  width:auto;
-  padding-left:0;
+	padding-left: 0;
+	width: auto;
 }
-#newContent .video-entry{
-  float:left;
-  margin:4px 5px;
-  padding:5px 6px;
-  width:129px;
-  height:145px;
+#newContent .video-list-item{
+	clear: none;
+	float: left;
+	height: 125px;
+	list-style: none;
+	margin: 4px 5px;
+	padding: 5px 6px;
+	width: 135px;
 }
-#newContent .video-entry .video-time{
-   
+#watch-related .video-list-item{
+	height: 140px;
 }
-#newContent .video-entry.active,
-#newContent .video-entry.been-there.active,
-#newContent .video-entry.been-there{
-  border:1px solid red;
-  padding:4px 3px;
+#newContent .video-list-item .title{
+	font-weight: bold;
+	max-height: inherit;
+	overflow: visible;
+	width: auto;
 }
-#newContent .video-entry.been-there{
-  background-color:#DDFF99;
-  border-color:#ddd;
+#newContent .video-list-item .video-time{
+	color: yellow !important;
 }
-#newContent .video-entry a img{
-  border:1px solid #4d4c4c;
+#newContent .video-list-item.active,#newContent .video-list-item.been-there.active,#newContent .video-list-item.been-there{
+	border: 1px solid red;
+	padding: 4px 3px;
 }
-#newContent .video-entry .video-thumb-90,
-#newContent .video-entry img.vimg90{
-  width:auto;
-  height:auto;
+#newContent .video-list-item.been-there{
+	background-color: #DDFF99;
+	border-color: #ddd;
+}
+#newContent .video-list-item a img{
+	border: 1px solid #4d4c4c;
+}
+#newContent .video-list-item .video-thumb,#newContent .video-list-item img.vimg90{
+	height: auto;
+	width: auto;
 }
 .video-main-content{
-  padding-top:3px;
+	padding-top: 3px;
 }
 .video-mini-title{
-  max-height:inherit;
-  
+	max-height: inherit;
 }
 .video-view-count{
-  color:#777;
+	color: #777;
 }
 .tabs{
-    border-bottom:1px solid #ddd;
-    xwidth:93%;
+	margin-bottom: -1px;
 }
 .tabs a.active{
-  background-color:#eee;
-  background-color:#fff;
-  color:#888888;
+	background-color: #fff;
+	color: #888888;
 }
 .tabs > a{
-  text-decoration:none;
-  background-color:#eee;
-  font-size:16px;
-  font-weight:bold;
-  line-height:34px;
-  margin:0 0 2px;
-  padding:8px;
-  border:1px solid #ccc;
-  border-width:1px 0 0 1px;
+	background-color: #eee;
+	border: 1px solid #ccc;
+	border-width: 1px 0 0 1px;
+	font-size: 16px;
+	font-weight: bold;
+	line-height: 34px;
+	margin: 0 0 2px;
+	padding: 8px;
+	text-decoration: none;
 }
 .tabs > a small{
-  color:#999999;
-  font-size:x-small;
-  padding-left:4px;
-  vertical-align:top;
-} 
+	color: #999999;
+	font-size: x-small;
+	padding-left: 4px;
+	vertical-align: top;
+}
+.tabs > a:nth-child(4){
+	border-width: 1px 1px 0;
+}
 .tabs > a:last-child{
-  xtext-decoration:line-through;
-  border-width:1px 1px 0;
+	border-width: 1px 1px 0px 0;
 }
 .tabs span{
-  float:right;
-  padding-top:8px;
+	float: right;
+	padding-top: 8px;
 }
 #newContent.comments .tabs span{
-  display:none;
+	display: none;
 }
 .tabs span a{
-  background-color:#EEEEEE;
-  padding:1px 4px;
-  margin-left:4px;
+	background-color: #EEEEEE;
+	margin-left: 4px;
+	padding: 1px 4px;
 }
-
 #newContent.comments .expander-small{
-  border:none;
+	border: none;
 }
-#watch-other-vids .search-form{
-  -moz-border-radius:3px;
-  background:#EAEAEA none repeat scroll 0 0;
-  border:1px solid #CCCCCC;
-  line-height:2em;
-  margin:0 0 0.6em;
-  padding:0.15em 0.2em;
-  white-space:nowrap;
+#rightSideContent .search-form{
+	background: #EAEAEA none repeat scroll 0 0;
+	border: 1px solid #CCCCCC;
+	line-height: 2em;
+	margin: 0 0 0.6em;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	padding: 0.15em 0.2em;
+	white-space: nowrap;
 }
-#watch-other-vids .search-term {
-  border:1px solid #999999;
-  font-size:100% !important;
-  height:1.5em;
-  padding:4px 1px 1px;
-  vertical-align:top;
-  width:19em;
-  color:#999;
+#rightSideContent .search-form button{
 }
-#watch-other-vids .search-term-focus{
-  border:2px solid #BBDAFD !important;
-  margin-top:0;margin-bottom:0;
-  padding-right:1px;padding-left:1px;
-  color:#000;
+#rightSideContent .search-term{
+	border: 1px solid #999999;
+	color: #999;
+	font-size: 100% !important;
+	height: 1.5em;
+	padding: 4px 1px 1px;
+	vertical-align: top;
+	width: 244px;
 }
-#watch-other-vids .search-form .yt-button {
-  font-size:0.92308em;
-  margin:0.0833em 0;
-  vertical-align:top;
+#rightSideContent .search-term-focus{
+	border: 2px solid #BBDAFD !important;
+	color: #000;
+	margin-bottom: 0;
+	margin-top: 0;
+	padding-left: 1px;
+	padding-right: 1px;
+}
+#rightSideContent .search-form .yt-button{
+	font-size: 0.92308em;
+	margin: 0.0833em 0;
+	vertical-align: top;
 }
 #watch-result-discoverbox ._loadingInfo{
-  display:none
+	display: none;
 }
-.headcoll,#deepLink,.historyContainer > a{
-  background:url(http://s.ytimg.com/yt/img/master-vfl125983.png) -36px -754px no-repeat;
-  padding:1px 22px 1px 1px;
+.headcoll span,.historyContainer > a{
+	background: url(http://s.ytimg.com/yt/img/master-vfl181572.png) -36px -754px no-repeat;
+	padding: 1px 22px 1px 1px;
 }
 .historyContainer > a{
-  padding-right:11px;
-  margin:1px;
-  display:none;
+	display: none;
+	margin: 1px;
+	padding-right: 11px;
 }
 .historyContainer > a.l{
-  background-position:-2px -637px;
-  margin-right:3px;
+	background-position: -2px -637px;
+	margin-right: 3px;
 }
 .historyContainer > a.r{
-  background-position:-12px -637px;
+	background-position: -12px -637px;
 }
 .headcoll{
-  background-position:-61px -756px;
-  background-position:-14px -698px;
-  padding:0 0 0 20px;
-  display:block;
-  height:14px;	
+	display: block;
+	height: 14px;
+}
+.headcoll span{
+	background-position: -18px -683px;
+	margin-right: 2px;
+	padding: 0 0 0 15px;
 }
 #grabVideos{
-  margin:5px 3px;
-  border-collapse:separate;
-  width:73%;
+	border-bottom: 1px solid #ddd;
+	border-collapse: separate;
+	margin: 15px 0px 5px 0px;
+	width: 100%;
 }
 #grabVideos th{
-  background-color:#DDD; 
-  padding:4px 0;
-  text-align:center;
-  font-size:122%;
+	background-color: #DDD;
+	font-size: 122%;
+	padding: 4px 0;
+	text-align: center;
 }
-#grabVideos td {
-  xbackground-color:#EEEEEE;
-  border:1px solid #ddd;
-  padding:7px 9px;
-  color:#999;
+#grabVideos td{
+	border: 1px solid #ddd;
+	color: #999;
+	padding: 7px 8px;
 }
-#grabVideos td._3gp,
-#grabVideos.small td.small,
-#grabVideos.large td.large,
-#grabVideos.medium td.medium,
-#grabVideos.hd720 td.hd720,
-#grabVideos.hd1080 td.hd1080{
-  color:blue;
-  cursor:pointer;
+#grabVideos._3gp td._3gp,#grabVideos.small td.small,#grabVideos.large td.large,#grabVideos.medium td.medium,#grabVideos.hd720 td.hd720,#grabVideos.hd1080 td.hd1080{
+	color: blue;
+	cursor: pointer;
 }
-#grabVideos td.hd1080{
-  display:none;
+#grabVideos td.hd1080x{
+	display: none;
 }
-
-/*
-#grabVideos.small td.medium,
-#grabVideos.small.medium td.small,
-#grabVideos td.hd1080,
-#grabVideos td.small{
-  display:none;
-}
-#grabVideos.small.medium td.medium,
-#grabVideos td._3gp,
-#grabVideos.small td.small{
-  display:block;
-}
-*/
 #grabVideos caption{
-  text-align:left;
-  font-size:16px;
-  border:1px solid #ddd;
-  margin-top:19px;
-  text-transform:capitalize;
-  padding:7px 5px 8px 5px;
+	border: 1px solid #ddd;
+	border-width: 1px 1px 0;
+	font-size: 16px;
+	padding: 7px 5px 8px 5px;
+	text-align: left;
+	text-transform: capitalize;
 }
 #grabVideos caption span,.yhistory span{
-  background:transparent url(http://s.ytimg.com/yt/img/master-vfl125983.png) no-repeat -137px -755px;
-  background:transparent url(http://s.ytimg.com/yt/img/master-vfl125983.png) no-repeat 0px -116px;
-  padding:0 11px;
-  margin-right:2px;
+	background: transparent url(http://s.ytimg.com/yt/img/master-vfl181572.png) no-repeat -137px -755px;
+	background: transparent url(http://s.ytimg.com/yt/img/master-vfl181572.png) no-repeat -19px -567px;
+	margin-right: 4px;
+	padding: 0 9px 0 10px;
 }
 #grabVideos caption small{
-  color:#6E6E6E;
-  display:block;
-  font-size:x-small;
-  white-space:pre;
-  text-indent:25px;
+	color: #6E6E6E;
+	display: block;
+	font-size: x-small;
+	text-indent: 25px;
+	white-space: pre;
 }
 #grabVideos .divider{
-  background-color:#f1f1f1;
-  background-color:#fff;
-  border:none;
+	background-color: #f1f1f1;
+	background-color: #fff;
+	border: none;
 }
 #_loadingInfo,._loadingInfo,.tabs a.waiting small{
-  background:#FFF3B3 url(http://s.ytimg.com/yt/img/icn_loading_animated-vfl24663.gif) center left no-repeat;
+	background: #FFF3B3 url(http://s.ytimg.com/yt/img/icn_loading_animated-vfl24663.gif) center left no-repeat;
 }
 .tabs > a.waiting small{
-  padding:4px 4px 4px 22px;
-  background-color:transparent;
+	background-color: transparent;
+	padding: 4px 4px 4px 22px;
 }
-
 #_loadingInfo,._loadingInfo{
-  border:1px solid #FED81C;
-  padding:3px 6px 3px 23px;
-  font-size:14px;
+	border: 1px solid #FED81C;
+	font-size: 12px;
+	margin-bottom: 5px;
+	padding: 3px 6px 3px 23px;
 }
 #_loadingInfo.visible{
-  visibility:visible;
+	visibility: visible;
 }
-#_loadingInfo.info.related.comments.user,
-#_loadingInfo{
- visibility:hidden;
+#_loadingInfo.info.related.comments.user,#_loadingInfo{
+	visibility: hidden;
 }
-#_loadingInfo.user .user,
-#_loadingInfo.related .related,
-#_loadingInfo.comments .comm, 
-#_loadingInfo.info .info{
-  text-decoration:line-through;
-  color:#666;
+#_loadingInfo.user .user,#_loadingInfo.related .related,#_loadingInfo.comments .comm,#_loadingInfo.info .info{
+	color: #666;
+	text-decoration: line-through;
 }
 .humanized_msg{
-  position: absolute;width:99%;
-  color: white;background-color: #8CC63F;
-  font-size: 31pt; text-align: center;
-  opacity:0.85;top:47%;padding:10px 4px;
-  z-index:999;display:none;
+	background-color: #8CC63F;
+	bottom: 0;
+	color: white;
+	display: none;
+	font-size: 31pt;
+	left: -10px;
+	opacity: 0.85;
+	padding: 10px 4px;
+	position: fixed;
+	text-align: center;
+	width: 100%;
+	z-index: 999;
 }
-
-.humanized_msg p{ padding:10px 54px; display: inline;background-color: #8CC63F;}
-
+.humanized_msg p{
+	background-color: #8CC63F;
+	display: inline;
+	padding: 10px 54px;
+}
 .yhistory{
-  margin-left:-49px;
-  cursor:pointer;
-  padding: 5px 7px 8px 8px;
-  background-color:#eee;
+	background-color: #eee;
+	cursor: pointer;
+	padding: 5px 7px 8px 8px;
 }
 .ytSettings{
-  padding:3px 0;
-  background-color:#eee;
+	background-color: #eee;
+	margin: 2px 0;
+	padding: 3px 0;
 }
 .ytSettings label input{
-  position:relative;
-  top:2px;
+	position: relative;
+	top: 3px;
 }
 p.info{
-  background-color:#eee;
-  padding:3px 2px;margin-bottom:9px;
+	background-color: #eee;
+	margin-bottom: 9px;
+	padding: 3px 2px;
 }
 #masthead p.info{
-  float:right;
-  margin-top:-33px;
+	float: right;
+	margin: -6px -13px 0px 0;
 }
 .yhistory:hover,.headcoll:hover{
-  text-decoration:none;
+	text-decoration: none;
 }
 .yhistory span{
-  background-position:0 -58px;
-  padding:0 7px;
+	background-position: -40px -62px;
+	padding: 0 7px;
 }
 .historyContainer{
-  border:1px solid #DDD;
-  background-color:#eee;
-  overflow:hidden;
-  margin-bottom:2px;
-  display:none;
-  padding-bottom:4px;
-  text-align:right;
-  padding:4px 3px 4px 0;
-  -moz-border-radius:3px;
+	background-color: #eee;
+	border: 1px solid #DDD;
+	display: none;
+	margin-bottom: 2px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
+	overflow: hidden;
+	padding: 4px 3px 4px 0;
+	padding-bottom: 4px;
+	text-align: right;
 }
 .historyContainer{
-  box-shadow: 0 0 8px #aaa;
-  -moz-box-shadow: 0 0 8px #aaa;
-  -webkit-box-shadow: 0 0 8px #aaa;
+	box-shadow: 0 0 8px #aaa;
+	-moz-box-shadow: 0 0 8px #aaa;
+	-webkit-box-shadow: 0 0 8px #aaa;
 }
-#watch-player-div{
-  box-shadow: 0 0 18px #333;
-  -moz-box-shadow: 0 0 18px #333;
-  -webkit-box-shadow: 0 0 18px #333;
-  margin-bottom:8px;
+.historyContainer,#watch-info{
+	width: 635px;
+}
+#_loadingInfo{
+	width: 610px;
+}
+#watch-info{
+	border: none;
+	margin-bottom: 0;
+}
+.yt-uix-expander-collapsed #watch-info{
+	border: 1px solid #DDD;
+}
+#watch-info.expanded{
+	box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+	margin-top: 8px;
+	padding: 0;
+}
+#watch-player{
+	margin: 0 0 8px 5px;
+}
+#watch-player.shadow{
+	box-shadow: 0 0 18px #333;
+	-moz-box-shadow: 0 0 18px #333;
+	padding:0.2px;
+	-webkit-box-shadow: 0 0 18px #333;
 }
 .historyContainer div{
-  width:1000px;
-  height:70px;
-  float:right;
-  overflow:hidden;
-  margin-bottom:2px;
+	float: right;
+	height: 70px;
+	margin-bottom: 2px;
+	overflow: hidden;
+	width: 1000px;
 }
 .historyContainer div a{
-  float:right;
+	float: right;
 }
 .historyContainer img{
-  margin:0 2px;
-  height:64px;
-  background-color:#fff;
-  padding:3px;
+	background-color: #fff;
+	height: 64px;
+	margin: 0 2px;
+	padding: 3px;
 }
 .historyContainer a:first-child{
 }
 .historyContainer a:first-child img{
-  height:60px;
-  border:3px solid red;
-  padding:1px;
+	border: 3px solid red;
+	height: 60px;
+	padding: 1px;
 }
-#watch-other-vids>div{
-  margin:2px 0;
+.watch-view-count{
+	margin-right: 3px;
+	xfont-size: 100%;
+}
+#footer{
+	padding: 10px 0 10px 10px;
+}
+#footer-container{
+	margin-top: 30px;
+}
+.video-thumb,.video-thumb .img{
+	height: 82px;
+	width: 123px;
+}
+.video-thumb .img img{
+	width: 100%;
+}
+#newContent .yt-uix-pager{
+	clear: both;
+	padding: 20px 20px 0 0;
+	text-align: right;
+}
+#newContent #watch-result-discoverbox .yt-uix-pager{
+	padding-top: 60px;
+}
+#newContent #watch-result-discoverbox .yt-uix-pager:first-child{
+	padding-top: 20px;
+}
+#newContent .yt-uix-pager button{
+	margin: 1px 3px;
+}
+#newContent .yt-uix-pager button.loading{
+	background: url(http://s.ytimg.com/yt/img/icn_loading_animated-vfl24663.gif) center center no-repeat;
+}
+#watch-description .watch-expander-body{
+	display: none;
+	height: auto !important;
+}
+#watch-description{
+	background: #fff;
+	margin: 6px 0;
+}
+#onHoverPlayer{
+	height: 83px;
+	margin-top: 5px;
+	overflow: hidden;
+	position: absolute;
+	visibility: hidden;
+	width: 123px;
+}
+#onHoverPlayer div{
+	height: 100%;
+	position: absolute;
+	width: 100%;
+}
+#onHoverPlayer object{
+	height: 128px;
+	margin-top: -25px;
+	width: 154px;
+}
+#srchOpt{
+	display: none;
+	float: right;
+	font-size: 87%;
+	margin: 2px 4px 0 0;
+}
+#srchOpt strong{
+	background-color: #ddd;
+	padding: 9px 0 3px 4px;
 }
