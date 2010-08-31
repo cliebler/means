@@ -344,7 +344,7 @@ youtube={
   },
   stopMiniVideo:function(el){
     try{_self.p.stopVideo && _self.p.stopVideo();_self.p.mute();_self.p.loadVideoById(1);}catch(c){};
-    $('#onHoverPlayer').css('visibility','hidden');
+    $('#onHoverPlayer').css('left','-420px');
   },
   playVideo:function(id, from, quality) {
    (function(){
@@ -433,8 +433,8 @@ function initDOM($,conf){
    $('<div>').attr('id','_loadingstuff').html(msg).attr('style',st).appendTo('body');  
   if(!videoID){return;}
 
-  var css="http://localhost/youtubian/less.cowbell.css";
-  var css="http://means.googlecode.com/svn/trunk/youtube/less.cowbell.css";
+  var css="http://www.smallmeans.com/apps/toolset/youtube/less.cowbell.css";
+  var xcss="http://means.googlecode.com/svn/trunk/youtube/less.cowbell.css";
   $('<link rel="stylesheet" type="text/css" href="'+css+'"/>').appendTo("head");
 
   $('<div class="humanized_msg"><p></p></div>').prependTo('body');
@@ -615,7 +615,7 @@ function initDOM($,conf){
       var a;_self.hovered=a=$(t).parents('a');
       if(typeof _self.p.mute!=='function') return false;
       _self.p.loadVideoById(_self.getNeedle('v',a.attr('href')));_self.p.unMute();
-      $('#onHoverPlayer').css('top',$(t).offset().top).css('left',$(t).offset().left).css('visibility','visible');
+      $('#onHoverPlayer').css('top',$(t).offset().top).css('left',$(t).offset().left);
       return false;
     }
   }).mouseout(function(event){
@@ -635,16 +635,15 @@ function initDOM($,conf){
  // all systems go!
 //
 youtube.require(
- 'http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js',
+ 'http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js',
  function(){
   youtube.require('http://means.googlecode.com/svn/trunk/youtube/jquery.tinysort.min.js');
-  (function($){
-    initDOM($,{
-     sticky:false,
-     maxSearch:50,
-     maxChannel:50,
-     maxRelated:40,
-     searchOrder:'relevance'
-    });
-  })(jQuery);
+  if(typeof _self!=="undefined")return;
+  initDOM(jQuery,{
+   sticky:false,
+   maxSearch:50,
+   maxChannel:50,
+   maxRelated:40,
+   searchOrder:'relevance'
+  });
 });
