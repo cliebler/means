@@ -1,4 +1,3 @@
-
 //Youtubian v1.2, 26 Aug 2010
 // http://www.smallmeans.com/tools/youtubian
 
@@ -25,7 +24,7 @@ youtube={
       small:{res:'176x144', type:'3GP', ratio:'11:9', fmt:17, name:'Mobile/3GP/MPEG4/AAC'}
    }
   },
-  config:{maxFavd:20,maxPagination:25},pagination:{},
+  config:{maxFavd:20,maxPagination:25,maxStdFeed:40},pagination:{},
   log:function() {
     //typeof console!=="undefined" && console.log && console.log([].slice.call(arguments));
   },
@@ -149,6 +148,7 @@ youtube={
       var th=p.find('img').attr('src');
       var title=p.find('img').attr('title'),context='#'+p.parent()[0].id;
       $(classes.watchViewsStats).find('strong').text(views);
+      $(classes.watchEmbedParent).removeClass('shadow')
       $(p).activate();
       _self.current=id;_self.user=user;
       _self.setTitle(title);
@@ -199,10 +199,20 @@ youtube={
     this.get("http://gdata.youtube.com/feeds/videos/"+id+"/related?"+
                  "max-results="+this.config.maxRelated+"&start-index="+from+"&alt=json",youtube.listRelatedVideos);
   },
+  getStandardFeed:function(what, when,index){
+    var base='http://gdata.youtube.com/feeds/api/standardfeeds/',from=index||1;
+    var time=when.toLowerCase().replace(' ','_'),type=what.toLowerCase().replace(' ','_'),url=base+type+'?';
+    if(time.length){url+="time="+time;};this.stdfeed={what:what,when:when};
+    this.get(url+"&max-results="+this.config.maxStdFeed+"&start-index="+from+"&alt=json",youtube.listStandardFeed);
+  },
   getSearchVideos:function(term,index){
     var from=index||1,order=this.config.searchOrder;this.s=term;
     this.get("http://gdata.youtube.com/feeds/api/videos?max-results="+this.config.maxSearch+"&start-index="+from+
                  "&v=2&q="+term+"&orderby="+order+"&safeSearch=none&alt=json",youtube.listResultVideos);
+  },
+  listStandardFeed:function(data){
+    $('#newContent .tabs > a[name=feed]').removeClass('waiting').find('small').text('');
+    _self.listVideos(data, classes.watchFeedContainer);
   },
   listChannelVideos:function(data){
       $('#_loadingInfo').addClass('user');
@@ -344,7 +354,7 @@ youtube={
   },
   stopMiniVideo:function(el){
     try{_self.p.stopVideo && _self.p.stopVideo();_self.p.mute();_self.p.loadVideoById(1);}catch(c){};
-    $('#onHoverPlayer').css('left','-420px');
+    $('#onHoverPlayer').css('visibility','hidden');
   },
   playVideo:function(id, from, quality) {
    (function(){
@@ -371,6 +381,7 @@ classes={
   watchCommentPanel:"#watch-discussion",
   watchRelatedDiscoverbox:'#watch-related',
   watchChannelVidsBody:'#watch-channel-discoverbox',
+  watchFeedContainer:'#watch-feed-discoverbox',
   watchResultDiscoverbox:'#watch-result-discoverbox',
   watchViewsStats:'#watch-views',
   watchRatingStats:'#watch-actions-left',
@@ -433,8 +444,7 @@ function initDOM($,conf){
    $('<div>').attr('id','_loadingstuff').html(msg).attr('style',st).appendTo('body');  
   if(!videoID){return;}
 
-  var css="http://www.smallmeans.com/apps/toolset/youtube/less.cowbell.css";
-  var xcss="http://means.googlecode.com/svn/trunk/youtube/less.cowbell.css";
+  var css="http://means.googlecode.com/svn/trunk/youtube/less.cowbell.css";
   $('<link rel="stylesheet" type="text/css" href="'+css+'"/>').appendTo("head");
 
   $('<div class="humanized_msg"><p></p></div>').prependTo('body');
@@ -449,6 +459,7 @@ function initDOM($,conf){
   $(classes.watchStatsPanel).after($(classes.watchStatsExtended).remove());
   _self.user=$('#watch-description a.watch-description-username').eq(0).text();
   $(classes.watchRelatedDiscoverbox).after(
+      '<div id="watch-feed-discoverbox" class="watch-discoverbox"></div>'+
       '<div id="watch-result-discoverbox" class="watch-discoverbox">'+
       '<div class="_loadingInfo">....if you\'re reading this, it is a slow day at work..</div></div>');
 
@@ -464,11 +475,29 @@ function initDOM($,conf){
        "<a href='#' name='user'>More from user</a>"+
        "<a href='#' name='comments' title='View at own peril'>Comments <small></small></a>"+
        "<a href='#' name='results'>Results <small title='Results'></small></a>"+
+       "<a href='#' name='feed'>Most viewed</a>"+
      "</div>")
     .prependTo('#newContent');
-   $("<a href='#'><span></span></a>").addClass('headcoll').click(function(){
-      $("#masthead").slideToggle();
+   $("<a href='#'></a><a href='#' class='l'></a>").addClass('headcoll').click(function(){
+      $($(this).hasClass('l')?"#masthead":"#charts-selector").slideToggle();
   }).prependTo("#masthead-container");
+  $('<div id="charts-selector">'+
+    '<button class=" yt-uix-button" type="button" data-button-listener=""><span class="yt-uix-button-content" id="yt-uix1">Most viewed</span> <img alt="" src="http://s.ytimg.com/yt/img/pixel-vfl73.gif" class="yt-uix-button-arrow"><ul class="yt-uix-button-menu hid" style="min-width: 99px; left: 25px; top: 148px; display: none;" anc="yt-uix1"><li><span class=" yt-uix-button-menu-item">Most viewed</span></li><li><span class=" yt-uix-button-menu-item">Most popular</span></li><li><span class=" yt-uix-button-menu-item">Recently featured</span></li><li><span class=" yt-uix-button-menu-item">Most discussed</span></li><li><span class=" yt-uix-button-menu-item">Most responded</span></li><li><span class=" yt-uix-button-menu-item">Most recent</span></li><li><span class=" yt-uix-button-menu-item">Top favorites</span></li><li><span class=" yt-uix-button-menu-item">Top rated</span></li></ul></button>'+
+    '<button class=" yt-uix-button" type="button"><span class="yt-uix-button-content" id="yt-uix2">Today</span> <img alt="" src="http://s.ytimg.com/yt/img/pixel-vfl73.gif" class="yt-uix-button-arrow"><ul class="yt-uix-button-menu" style="display: none;" anc="yt-uix2"><li><span class=" yt-uix-button-menu-item">Today</span></li><li><span class=" yt-uix-button-menu-item">This Week</span></li><li><span class=" yt-uix-button-menu-item">This Month</span></li><li><span class=" yt-uix-button-menu-item">All Time</span></li></ul></button>'+
+    '<button class=" yt-uix-button go" type="button">Go</button>'+
+   '</div>').appendTo('#masthead-container');
+  var timeless=['Most recent','Recently featured'];
+  $('#charts-selector').find('span').click(function(){
+    var m=$(this),t=m.text(),p=m.parents('ul').attr('anc');
+    if(p=='yt-uix1')$('#yt-uix2').css('color',$.inArray(t, timeless)>-1?'#ccc':'#000');
+    $('#'+p).text(t);
+  }).end().find('button.go').click(function(){
+    var what=$('#yt-uix1').text(),when=$('#yt-uix2').text(),and=' ~ ';
+    if($.inArray(what, timeless)>-1){and=when='';}
+    _self.getStandardFeed(what,when);
+    $('#_loadingInfo')[0].scrollIntoView();
+    $('#newContent .tabs > a[name=feed]').html(what+and+when+'<small>loading..</small>').addClass('waiting').show().dispatch('click');
+  });
   $("<div id='srchOpt'><strong>Sort by:</strong><label><input type='radio' name='searchOrder' value='relevance' checked/>Relevance</label>"+
      "<label><input type='radio' name='searchOrder' value='published'/>Upload date</label>"+
      "<label><input type='radio' name='searchOrder' value='viewCount'/>View count</label>"+
@@ -512,7 +541,7 @@ function initDOM($,conf){
     });
   });
   $('#masthead p.info').hide();
-  $('#newContent .tabs > a[name=results]').hide();
+  $('#newContent .tabs > a[name=results],#newContent .tabs > a[name=feed]').hide();
   $(classes.watchEmbedParent).addClass('shadow');
   $('#newContent').addClass('related').find('.tabs > a').eq(0).addClass('active');
   $('#newContent .tabs span a:eq(0)').click(function(){
@@ -558,6 +587,9 @@ function initDOM($,conf){
       case classes.watchResultDiscoverbox:
       _self.getSearchVideos(_self.s,n);
       break;
+      case classes.watchFeedContainer:
+      _self.getStandardFeed(_self.stdfeed.what,_self.stdfeed.when,n);
+      break;
     }
     _self.pagination[id]=n;
     $(this).siblings().removeClass(c).end().addClass(c+' loading');
@@ -580,7 +612,7 @@ function initDOM($,conf){
      );
      return false;
   });
-  $("<div id='onHoverPlayer'>").append('<div/><object type="application/x-shockwave-flash" data="/apiplayer?enablejsapi=1&amp;playerapiid=ytplayer"><param name="allowScriptAccess" value="always"><param name="wmode" value="transparent"></object>').appendTo('#newContent');
+  $("<div id='onHoverPlayer'>").append('<div/><object type="application/x-shockwave-flash" data="/apiplayer?enablejsapi=1&amp;playerapiid=ytplayer"><param name="allowScriptAccess" value="always"><param name="wmode" value="opaque"></object>').appendTo('#newContent');
   $('#rightSideContent').prepend($('#masthead-search form.search-form').clone(true).attr('name','altSrch'));
   $('#rightSideContent .search-form .search-term').each(function() {
     var defValue = this.value="Results will appear below";this.id=this.name='';
@@ -615,7 +647,7 @@ function initDOM($,conf){
       var a;_self.hovered=a=$(t).parents('a');
       if(typeof _self.p.mute!=='function') return false;
       _self.p.loadVideoById(_self.getNeedle('v',a.attr('href')));_self.p.unMute();
-      $('#onHoverPlayer').css('top',$(t).offset().top).css('left',$(t).offset().left);
+      $('#onHoverPlayer').css('top',$(t).offset().top).css('left',$(t).offset().left).css('visibility','visible');
       return false;
     }
   }).mouseout(function(event){
