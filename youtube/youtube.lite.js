@@ -1,6 +1,7 @@
-//Youtubian v1.2, 26 Aug 2010
-// http://www.smallmeans.com/tools/youtubian
-
+/******************************************
+Youtubian v1.4, 23 Sept 2010
+http://www.smallmeans.com/tools/youtubian
+/*****************************************/
 
 var player,
 youtube={
@@ -26,11 +27,10 @@ youtube={
   },
   config:{maxFavd:20,maxPagination:25,maxStdFeed:40},pagination:{},
   log:function() {
-    //typeof console!=="undefined" && console.log && console.log([].slice.call(arguments));
+    typeof console!="undefined" && console.log && console.log([].slice.call(arguments));
   },
   require: function (src, callback) {
     var c = document.createElement("script");
-
     c.type = "text/javascript";
     if (callback) {
       c.onload = callback;
@@ -148,7 +148,7 @@ youtube={
       var th=p.find('img').attr('src');
       var title=p.find('img').attr('title'),context='#'+p.parent()[0].id;
       $(classes.watchViewsStats).find('strong').text(views);
-      $(classes.watchEmbedParent).removeClass('shadow')
+      $(classes.watchEmbedParent).removeClass('shadow');
       $(p).activate();
       _self.current=id;_self.user=user;
       _self.setTitle(title);
@@ -169,8 +169,7 @@ youtube={
   },
   addHistory:function(obj){
     $('<a href="/watch?v='+obj.i+'">')
-       .data('stuff',obj)
-       .attr('title',obj.t).attr('target','_blank')
+       .attr('u',obj.u).attr('title',obj.t).attr('target','_blank')
        .append('<img src="'+obj.th+'"/></a>')
     .prependTo('.historyContainer div'); 
   },
@@ -278,7 +277,7 @@ youtube={
 		' <a href="/watch?v='+t.id+'" class="video-list-item-link">'+
 		'  <span class="video-thumb ux-thumb-94 ux-thumb-96">'+
 		'   <span class="img"><img alt="'+t.title+'" title="'+t.title+'" class="vimg90" src="'+thumb+'"/></span>'+
-		'   <span class="video-time">'+dur+'</span></span>'+
+		'   <span class="video-time" date="'+t.pdate+'">'+dur+'</span></span>'+
 		'  <span title="'+t.title+'" class="title video-mini-title">'+t.title+'</span>'+
 		'  <span class="stat video-username">'+t.user+'</span>'+
 		'  <span class="stat view-count">'+t.views+' views</span>'+
@@ -297,7 +296,7 @@ youtube={
     var url="/get_video_info?asv=&noflv=1&video_id="+_self.current;
     $.get(url, function(data){
       var token=_self.getNeedle('token', data);
-      _self.log(url,'>>>',data,token)
+      //_self.log(url,'>>>',data,token)
       if(!token){_self.yell(_self.getNeedle('reason', data).replace(/\+/g,' '),true);try{_self.w.close()}catch(c){};return;}
       var uri=_self.getDownloadURL(_self.current, token, format);
       callback && callback(uri);
@@ -319,10 +318,13 @@ youtube={
     return player.getCurrentTime();
   },
   sortByDuration:function(){
-    jQuery("#newContent .video-list-item").tsort(".video-time",{place:"end",order:"desc",attr:"duration"});
+    jQuery("#newContent .video-list-item").tsort(".video-time",{order:"desc",attr:"duration"});
+  },
+  sortByDate:function(){
+    jQuery("#newContent .video-list-item").tsort(".video-time",{order:"desc",attr:"date"});
   },
   sortByViews:function(){
-    jQuery("#newContent .video-list-item").tsort(".view-count",{place:"end",order:"desc",attr:"views"});
+    jQuery("#newContent .video-list-item").tsort(".view-count",{order:"desc",attr:"views"});
   },
   videoReady:function(){
     var c=player.getAvailableQualityLevels();
@@ -377,6 +379,8 @@ youtube={
 },
 classes={
   watchMainContainer:'#watch-container',
+  embedCodeContainer:'#watch-actions-area',
+  embedCodeTextArea:'#watch-embed-code',
   watchEmbedParent:'#watch-player',
   watchCommentPanel:"#watch-discussion",
   watchRelatedDiscoverbox:'#watch-related',
@@ -385,6 +389,7 @@ classes={
   watchResultDiscoverbox:'#watch-result-discoverbox',
   watchViewsStats:'#watch-views',
   watchRatingStats:'#watch-actions-left',
+  embedCode:'#watch-actions-right',
   watchStatsPanel:'#watch-actions',
   watchStatsExtended:'#watch-info',
   watchThisVid:'#watch-this-vid',
@@ -457,6 +462,7 @@ function initDOM($,conf){
   $(classes.watchChannelVidsBody).remove().appendTo("#newContent");
   $(classes.watchViewsStats).remove().prependTo(classes.watchStatsPanel);
   $(classes.watchStatsPanel).after($(classes.watchStatsExtended).remove());
+  $(classes.watchRatingStats).after($(classes.embedCode).remove())
   _self.user=$('#watch-description a.watch-description-username').eq(0).text();
   $(classes.watchRelatedDiscoverbox).after(
       '<div id="watch-feed-discoverbox" class="watch-discoverbox"></div>'+
@@ -470,7 +476,7 @@ function initDOM($,conf){
       " <span class='user'>user channel</span>"+
      "</div>"+
      "<div class='tabs'>"+
-       "<span>Order videos by: <a href='#'>views</a><a href='#'>duration</a></span>"+
+       "<span>Order videos by: <a href='#' u='0'>views</a><a href='#' u='1'>duration</a><a href='#' u='2'>date</a></span>"+
        "<a href='#' name='related'>Related videos</a>"+
        "<a href='#' name='user'>More from user</a>"+
        "<a href='#' name='comments' title='View at own peril'>Comments <small></small></a>"+
@@ -523,7 +529,7 @@ function initDOM($,conf){
   $(classes.watchCommentPanel+' .video-list').remove();
   $(classes.watchRatingStats).find('.action-bar-ratings-stats').attr('title','').removeClass('yt-uix-tooltip');
   var hist=$('<a class="yhistory"><span/>Viewing history</a>').attr('title', 'Videos watched in this session').click(function(){$('.historyContainer').slideToggle();});
-  $(classes.watchRatingStats).after(hist);
+  $(classes.embedCode).after(hist);
   _self.tab=classes.watchRelatedDiscoverbox;
   $("#grabVideos td:not(.divider)").each(function(){
     var c=$(this).attr('class').split(' '), s=c[0],f=c[1],o=_self.formats[f][s],fmt=o.fmt || '';
@@ -544,16 +550,15 @@ function initDOM($,conf){
   $('#newContent .tabs > a[name=results],#newContent .tabs > a[name=feed]').hide();
   $(classes.watchEmbedParent).addClass('shadow');
   $('#newContent').addClass('related').find('.tabs > a').eq(0).addClass('active');
-  $('#newContent .tabs span a:eq(0)').click(function(){
-    _self.sortByViews();
+  $('#newContent .tabs span a').click(function(){
+    switch(Number($(this).attr('u'))){
+      case 0:_self.sortByViews();break;
+      case 1:_self.sortByDuration();break;
+      case 2:_self.sortByDate();
+    }
     $(this).activate();
     return false;
-  });    
-  $('#newContent .tabs span a:eq(1)').click(function(){    
-    _self.sortByDuration();
-    $(this).activate();
-    return false;
-  });    
+  });  
   $('#newContent .tabs > a').click(function(){
     var p=$(this).parent().parent();
     p.attr('class', $(this).attr('name'));
@@ -594,12 +599,13 @@ function initDOM($,conf){
     _self.pagination[id]=n;
     $(this).siblings().removeClass(c).end().addClass(c+' loading');
   });
-  $('.historyContainer div a').live('click',function(e){
-    if(e.button!=0){return true;}
-    var o=$(this).data('stuff');
-    _self.current=o.i;
-    _self.requestVideo(o.i,o.u);
-    _self.setTitle(o.t);
+  $('.historyContainer div').click(function(e){
+    var m=e.target,p=$(m).parent();
+    if(e.button!=0||m.tagName!='IMG'){return true;}
+    var id=_self.getNeedle('v',p.attr('href'));
+    _self.requestVideo(id,p.attr('u'));
+    _self.setTitle(p.attr('title'));
+    _self.current=id;
     return false;
   });
   $('#eow-description-short').after($('<a><span class="m">more info</span><span class="l">less info</span></a>').click(function(){
@@ -613,7 +619,7 @@ function initDOM($,conf){
      return false;
   });
   $("<div id='onHoverPlayer'>").append('<div/><object type="application/x-shockwave-flash" data="/apiplayer?enablejsapi=1&amp;playerapiid=ytplayer"><param name="allowScriptAccess" value="always"><param name="wmode" value="opaque"></object>').appendTo('#newContent');
-  $('#rightSideContent').prepend($('#masthead-search form.search-form').clone(true).attr('name','altSrch'));
+  $('#rightSideContent').prepend($('form.search-form').clone(true).attr('name','altSrch'));
   $('#rightSideContent .search-form .search-term').each(function() {
     var defValue = this.value="Results will appear below";this.id=this.name='';
     $(this).bind('focus blur',function(e) {
@@ -656,7 +662,25 @@ function initDOM($,conf){
       _self.stopMiniVideo();return false;
     }
   }).mouseleave(function(event){_self.stopMiniVideo();});
+  $(classes.embedCode).find('button:eq(0)').click(function(){
+    $(classes.embedCodeTextArea).attr("disabled", true);
+    $(classes.embedCodeContainer).parent().toggleClass('collapsed');
+    return false;
+  })
   $('#onHoverPlayer div').click(function(e){_self.OnClick(_self.hovered,e);return false;});
+  $.get('/watch_ajax?'+$.param({action_customize_embed:1}),function(xml){
+    $(classes.embedCodeContainer).html($(xml).find('html_content').text());
+    $('#watch-customize-embed-options').before(
+      $('<button class=" yt-uix-button" type="button">Apply changes:<br/><span>Double-click here when ready</span>, then press CTRL + C</button>')
+       .addClass('embedCodeReady').click(function(){
+         var t=$(classes.embedCodeTextArea).attr("disabled", false);
+         t.val(t.val().replace(/\/v\/[^?]+/g,'/v/'+_self.current)).dispatch('click');
+       })
+    );
+    $('#watch-embed-size-medium-box').dispatch('click');
+  });
+ $('.video-list-item .video-time', classes.watchRelatedDiscoverbox).each(function(){$(this).attr('date',0);});
+  $('#footer .pickers').prepend($('<li>').addClass('appInfo').html('Furnitures gently re-arranged by <a target="_blank" href="http://www.smallmeans.com/tools/youtubian/">Youtubelite '+_self.config.appVer+'</a>'));
 
   _self.addOnClick(classes.watchRelatedDiscoverbox);
   _self.addOnClick(classes.watchChannelVidsBody);
@@ -666,12 +690,13 @@ function initDOM($,conf){
   //
  // all systems go!
 //
-youtube.require(
+/youtube.com$/.test(document.domain) && youtube.require(
  'http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js',
  function(){
   youtube.require('http://means.googlecode.com/svn/trunk/youtube/jquery.tinysort.min.js');
   if(typeof _self!=="undefined")return;
   initDOM(jQuery,{
+   appVer:1.4,
    sticky:false,
    maxSearch:50,
    maxChannel:50,
